@@ -1,7 +1,7 @@
 '''
 Plotting CA, mutation map and mutational age.
 
-Jacob Scott 23 Decemeber 2015
+Jacob Scott 23 December 2015
 
 '''
 import matplotlib.pyplot as plt
@@ -32,6 +32,7 @@ biopsy_num = 3 #desired number of biopsies
 r = 3 #euclidean distance from random point that you include in biopsy
 SI1 = 0 #placeholders for Shannon Index values
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
+detection_threshold = 0.9 #threshold for detection of clone/allele
 
 
 #bit string data
@@ -105,59 +106,42 @@ for bx in range(0, biopsy_num):
 			cell_of_interest = biopsy_Genlist_temp[cell] #find all the position X genes for every cell
 			site_list.append(cell_of_interest[site]) #make a list of them
 		total_mut_at_site[bx][site] = sum_digits(site_list) #add up the total mutations at the site of interest
-		if total_mut_at_site[bx][site]/len(biopsy_Genlist_temp) > 0.9: #find the percent positive
+		if total_mut_at_site[bx][site]/len(biopsy_Genlist_temp) > detection_threshold: #find the percent positive
 			total_muts[bx][site] = 1 #if > threshold, count as clonal
-	# print biopsy_Mutlist_temp
 	for cell in range(0, len(biopsy_Mutlist_temp)): #over every cell in the biopsy
 		for i in range(1,genomelength):
 			if biopsy_Mutlist_temp[cell] == i: 
 				muts_of_type[bx][i-1]+=1
-				#print muts_of_type
-		
-# print muts_of_type
-# print total_muts
-# print total_mut_at_site
-
 
 '''plot histograms'''
 allele_ID = np.linspace(1,genomelength,genomelength)
 rcParams['figure.figsize'] = 20,10
 for i in range(0,biopsy_num):
-	# collect the histograms of interest
-	# mut_keys = muts_inBx[i].keys()
-	# y_pos = np.arange(len(mut_keys))
-	# performance = [muts_inBx[i][k] for k in mut_keys]
-	#print performance
-	plt.subplot(2, 3, i+1)
-	# plt.bar(y_pos, performance, align='center', alpha=0.4)
+	colors = []
+	plt.subplot(2, 3, i+1) 
 	plt.bar(allele_ID, muts_of_type[i]/cell_count_inBx[i], align='center', alpha=0.4)
-	# plt.xticks(y_pos, mut_keys)
 	plt.xticks(allele_ID)
 	plt.xlabel('frequecy of clone')	
 	plt.xlabel('Unique mutation flag')
 	plt.ylim([0, 1])
-	plt.title('Biopsy #'+str(i+1)+'Position'+str(biopsy_sites[i]))
-	# plt.figure()
+	plt.title('Biopsy # '+str(i+1)+': Position '+str(biopsy_sites[i]))
 
 ''' plot allele frequncies'''
 
 for i in range(0,biopsy_num):
 	allele_freq = total_mut_at_site[i]/cell_count_inBx[i]
-	# print allele_freq
 	plt.subplot(2, 3, i+4)
-	plt.bar(allele_ID, allele_freq, align='center', alpha=0.4)
-	# plt.xticks(y_pos, mut_keys)
+	for position in total_muts[i]: 
+		if total_muts[i][position]!=1: 
+			colors.append('r')
+		else: colors.append('b') #assign red color to alleles above detection threshold
+	plt.bar(allele_ID, allele_freq, align='center', alpha=1, color=colors)
 	plt.xticks(allele_ID)
 	plt.ylabel('frequency')	
 	plt.xlabel('allele')
-	# plt.title('Biopsy #'+str(i+1)+'Position'+str(biopsy_sites[i]))
-	# plt.figure()
 
 '''PLOT CA and biopsy areas'''
 
-# plt.subplot(2, 2, 1)
-# CAfig = plt.figure()
-# CAfig.set_size_inches(10,12, forward=True)
 rcParams['figure.figsize'] = 13, 10
 plt.figure()
 
@@ -179,10 +163,3 @@ plt.ylim([0, size])
 
 
 plt.show()
-
-	# plt.subplot(2, 1, 2)
-	# plt.subplot2grid((3,4), (0,4), colspan=1, rowspan = 1)
-
-
-# plt.subplot(2, 1, 1)
-# plt.subplot2grid((3,4), (0,0), colspan=3, rowspan = 3)
