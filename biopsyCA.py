@@ -32,8 +32,7 @@ biopsy_num = 3 #desired number of biopsies
 r = 3 #euclidean distance from random point that you include in biopsy
 SI1 = 0 #placeholders for Shannon Index values
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
-detection_threshold = 0.9 #threshold for detection of clone/allele
-
+detection_threshold = 0.3 #threshold for detection of clone/allele
 
 #bit string data
 data = open('../andrea_test/non-stem/text/genomes'+str(time)).read().replace(',','\n').replace('\n','')
@@ -117,7 +116,6 @@ for bx in range(0, biopsy_num):
 allele_ID = np.linspace(1,genomelength,genomelength)
 rcParams['figure.figsize'] = 20,10
 for i in range(0,biopsy_num):
-	colors = []
 	plt.subplot(2, 3, i+1) 
 	plt.bar(allele_ID, muts_of_type[i]/cell_count_inBx[i], align='center', alpha=0.4)
 	plt.xticks(allele_ID)
@@ -129,10 +127,11 @@ for i in range(0,biopsy_num):
 ''' plot allele frequncies'''
 
 for i in range(0,biopsy_num):
+	colors = []
 	allele_freq = total_mut_at_site[i]/cell_count_inBx[i]
 	plt.subplot(2, 3, i+4)
-	for position in total_muts[i]: 
-		if total_muts[i][position]!=1: 
+	for position in range(0,len(total_muts[i])): 
+		if total_muts[i][position]==1: 
 			colors.append('r')
 		else: colors.append('b') #assign red color to alleles above detection threshold
 	plt.bar(allele_ID, allele_freq, align='center', alpha=1, color=colors)
