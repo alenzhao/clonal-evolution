@@ -10,6 +10,16 @@ import random
 from scipy.spatial import distance
 from collections import Counter
 from matplotlib.patches import Circle
+from math import log as ln
+from pylab import rcParams
+
+#calculate the shannon index
+def shannon(n, N):
+        """ Relative abundance """
+        if n == 0:
+            return 0
+        else:
+            return (float(n)/N) * ln(float(n)/N)
 
 #sum up the digits in a string
 def sum_digits(digit):
@@ -20,7 +30,7 @@ time = 200
 #pick a X random points, then find all the other elements within a range, r, of the point
 biopsy_num = 3 #desired number of biopsies
 r = 3 #euclidean distance from random point that you include in biopsy
-
+SI1 = 0 #placeholders for Shannon Index values
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
 
 
@@ -38,6 +48,9 @@ data = open('../andrea_test/non-stem/text/carriedMutation'+str(time)).read().rep
 x = data.split()
 CA = np.array(x).astype('int')
 CM1 = np.reshape(CA, (size,size))
+N1 = np.count_nonzero(CA)
+for species in range (1, np.amax(CA)): SI1 = SI1 + shannon(np.bincount(CA)[species],N1)
+SItrunc = float("{0:.4f}".format(SI1))
 
 #'biopsy' at random some circle of cells
 biopsy_sites = [] #a list of the sites of biopsy - ordered pairs
@@ -59,7 +72,7 @@ while len(biopsy_sites) < biopsy_num:
 		distances.append(distance.euclidean(newpoint,biopsy_sites[element]))
 	if min(distances) > 2*r: biopsy_sites.append(newpoint)
 
-print biopsy_sites
+# print biopsy_sites
 cell_count_inBx = np.zeros(biopsy_num)
 
 for bx in range(0, biopsy_num):
@@ -94,21 +107,21 @@ for bx in range(0, biopsy_num):
 		total_mut_at_site[bx][site] = sum_digits(site_list) #add up the total mutations at the site of interest
 		if total_mut_at_site[bx][site]/len(biopsy_Genlist_temp) > 0.9: #find the percent positive
 			total_muts[bx][site] = 1 #if > threshold, count as clonal
-	print biopsy_Mutlist_temp
+	# print biopsy_Mutlist_temp
 	for cell in range(0, len(biopsy_Mutlist_temp)): #over every cell in the biopsy
 		for i in range(1,genomelength):
 			if biopsy_Mutlist_temp[cell] == i: 
 				muts_of_type[bx][i-1]+=1
 				#print muts_of_type
 		
-print muts_of_type
+# print muts_of_type
 # print total_muts
 # print total_mut_at_site
 
 
 '''plot histograms'''
 allele_ID = np.linspace(1,genomelength,genomelength)
-
+rcParams['figure.figsize'] = 20,10
 for i in range(0,biopsy_num):
 	# collect the histograms of interest
 	# mut_keys = muts_inBx[i].keys()
@@ -141,13 +154,18 @@ for i in range(0,biopsy_num):
 	# plt.figure()
 
 '''PLOT CA and biopsy areas'''
+
 # plt.subplot(2, 2, 1)
+# CAfig = plt.figure()
+# CAfig.set_size_inches(10,12, forward=True)
+rcParams['figure.figsize'] = 13, 10
 plt.figure()
+
 ax1 = plt.pcolor(CM1, cmap='nipy_spectral', vmin = 0.001)
 plt.colorbar()
 
 # initialize axis, important: set the aspect ratio to equal
-plt.title('Total mutations')
+plt.title('Shannon Index: '+str(-SItrunc))
 
 x,y = zip(*biopsy_sites)
 
