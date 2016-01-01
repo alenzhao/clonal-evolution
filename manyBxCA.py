@@ -15,15 +15,34 @@ from pylab import rcParams
 
 #calculate the shannon index
 def shannon(n, N):
-        """ Relative abundance """
-        if n == 0:
-            return 0
-        else:
-            return (float(n)/N) * ln(float(n)/N)
+    """ Relative abundance """
+    if n == 0:
+        return 0
+    else:
+        return (float(n)/N) * ln(float(n)/N)
 
 #sum up the digits in a string
 def sum_digits(digit):
     return sum(int(x) for x in digit if x.isdigit())
+
+def do_biopsies(size, biopsy_num, r, CM1): 
+	cell_count_inBx = np.zeros(biopsy_num)
+	for bx in range(0, biopsy_num):
+		biopsy_Mutlist_temp = [] # for the mutation flags
+		muts_inBx_temp = []
+		punch = biopsy_sites[bx]
+		for row in range(0, size):
+			for column in range(0, size):
+				a = (row,column)
+				if distance.euclidean(a,punch) <= r: 
+					biopsy_Mutlist_temp.append(CM1[column][row])
+		cell_count_inBx[bx] = len(biopsy_Mutlist_temp)
+		SIBx_temp = 0
+		for x in range (0, np.amax(biopsy_Mutlist_temp)):
+			SIBx_temp += shannon(np.bincount(biopsy_Mutlist_temp)[x],cell_count_inBx[bx])
+		SIBx_temp = float("{0:.3f}".format(SIBx_temp))
+		SIBx.append(-SIBx_temp)
+	return SIBx
 
 size = 20 #size of the array
 time = 200
@@ -65,41 +84,42 @@ muts_of_type = np.zeros((biopsy_num,genomelength))
 point1 = [random.randint(r,size-r),random.randint(r,size-r)] #pick a random position at least r from the edge
 biopsy_sites.append(point1)
 
-while len(biopsy_sites) < biopsy_num: #generate a crap load of biopsy sites
+rcParams['figure.figsize'] = 11,5
+'''plot histogram radius #1'''
+r = 3
+#create biopsy site at random
+while len(biopsy_sites) < biopsy_num:
 	newpoint = [random.randint(r,size-r),random.randint(r,size-r)] #not including over the edge
-	biopsy_sites.append(newpoint) 
+	biopsy_sites.append(newpoint)
 
-cell_count_inBx = np.zeros(biopsy_num)
+SIBx = do_biopsies(size, biopsy_num, r, CM1)
 
-for bx in range(0, biopsy_num):
-	biopsy_Mutlist_temp = [] # for the mutation flags
-	muts_inBx_temp = []
-	punch = biopsy_sites[bx]
-	for row in range(0, size):
-		for column in range(0, size):
-			a = (row,column)
-			if distance.euclidean(a,punch) <= r: 
-				biopsy_Mutlist_temp.append(CM1[column][row])
-	cell_count_inBx[bx] = len(biopsy_Mutlist_temp)
-	SIBx_temp = 0
-	for x in range (0, np.amax(biopsy_Mutlist_temp)):
-		SIBx_temp += shannon(np.bincount(biopsy_Mutlist_temp)[x],cell_count_inBx[bx])
-	SIBx_temp = float("{0:.3f}".format(SIBx_temp))
-	SIBx.append(-SIBx_temp)
-
-#print SIBx
-
-'''plot histogram'''
-rcParams['figure.figsize'] = 10,17
-plt.subplot(2,1,2)
+plt.subplot(1,3,2)
 plt.hist(SIBx)
 plt.xlabel('Shannon Index')	
 plt.ylabel('frequency')
-plt.title('Shannon Indices over '+str(biopsy_num)+' samples of size '+str(r)+'. Whole tumour SI='+str(-SItrunc))
+plt.title('Shannon Indices of '+str(biopsy_num)+' biopsies w/ radius '+str(r)+'. Tumour SI='+str(-SItrunc))
+
+'''plot histogram radius #2'''
+
+r = 5
+#create biopsy site at random
+while len(biopsy_sites) < biopsy_num:
+	newpoint = [random.randint(r,size-r),random.randint(r,size-r)] #not including over the edge
+	biopsy_sites.append(newpoint)
+
+SIBx = do_biopsies(size, biopsy_num, r, CM1)
+
+plt.subplot(1,3,3)
+plt.hist(SIBx)
+plt.xlabel('Shannon Index')	
+plt.ylabel('frequency')
+plt.title('Shannon Indices of '+str(biopsy_num)+' biopsies w/ radius '+str(r)+'. Tumour SI='+str(-SItrunc))
+
 
 '''PLOT CA and biopsy areas'''
 
-plt.subplot(2,1,1)
+plt.subplot(1,3,1)
 # plt.figure()
 ax1 = plt.pcolor(CM1, cmap='nipy_spectral', vmin = 0.001)
 plt.colorbar()
