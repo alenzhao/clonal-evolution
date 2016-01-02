@@ -26,6 +26,12 @@ def shannon(n, N):
 def sum_digits(digit):
     return sum(int(x) for x in digit if x.isdigit())
 
+def gather_biopsies(biopsy_num, r):
+	while len(biopsy_sites) < biopsy_num:
+		newpoint = [random.randint(r,size-r),random.randint(r,size-r)] #not including over the edge
+		biopsy_sites.append(newpoint)
+	return biopsy_sites
+
 size = 100 #size of the array
 time = 1000
 #pick X random points, then find all the other elements within a range, r, of the point
@@ -66,12 +72,7 @@ positive_alleles = np.zeros(genomelength).astype('int') #to be used to store all
 point1 = [random.randint(r,size-r),random.randint(r,size-r)] #pick a random position at least r from the edge
 biopsy_sites.append(point1)
 
-while len(biopsy_sites) < biopsy_num:
-	newpoint = [random.randint(r,size-r),random.randint(r,size-r)]
-	distances = []
-	for element in range(0, len(biopsy_sites)):
-		distances.append(distance.euclidean(newpoint,biopsy_sites[element]))
-	if min(distances) > 2*r: biopsy_sites.append(newpoint)
+biopsy_sites = gather_biopsies(biopsy_num,r)
 
 # print biopsy_sites
 cell_count_inBx = np.zeros(biopsy_num)
