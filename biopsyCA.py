@@ -42,7 +42,7 @@ total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
 detection_threshold = 0.6 #threshold for detection of clone/allele
 
 #bit string data
-data = open('../andrea_test/non-stem/text/genomes'+str(time)).read().replace(',','\n').replace('\n','')
+data = open('../andrea_test/stem/text/genomes'+str(time)).read().replace(',','\n').replace('\n','')
 x = data.split()
 CA = np.array(x).astype('string')
 Genomes = np.reshape(CA, (size,size))
@@ -51,7 +51,7 @@ for entry in range(0, size**2):	total_mut1[entry] = np.array(sum_digits(CA[entry
 mut_array1 = np.reshape(total_mut1, (size,size))
 
 #mutation flag data
-data = open('../andrea_test/non-stem/text/carriedMutation'+str(time)).read().replace(',','\n').replace('\n','')
+data = open('../andrea_test/stem/text/carriedMutation'+str(time)).read().replace(',','\n').replace('\n','')
 x = data.split()
 CA = np.array(x).astype('int')
 CM1 = np.reshape(CA, (size,size))
@@ -126,11 +126,17 @@ muts_of_type_trunc = np.delete(muts_of_type, truncation_list, 1)
 total_mut_at_site_trunc = np.delete(total_mut_at_site, truncation_list, 1)
 alleles_trunc = np.delete(allele_ID, truncation_list)
 
+# print total_muts[1]
 '''plot histograms'''
+rcParams['figure.figsize'] = 10,10
+plt.hist(CM1, normed=True)
 
-rcParams['figure.figsize'] = 20,10
+
+# plt.figure()
+rcParams['figure.figsize'] = 7,7
 for i in range(0,biopsy_num):
-	plt.subplot(2, biopsy_num, i+1) 
+	plt.figure()
+	# plt.subplot(2, biopsy_num, i+1) 
 	plt.bar(alleles_trunc, muts_of_type_trunc[i]/cell_count_inBx[i], align='center', alpha=0.4)
 	plt.xticks(alleles_trunc, rotation = 315)
 	plt.xlabel('frequecy of clone')	
@@ -138,12 +144,28 @@ for i in range(0,biopsy_num):
 	plt.ylim([0, 1])
 	plt.title('Biopsy # '+str(i+1)+': Position '+str(biopsy_sites[i]))
 
+# for i in range(0,biopsy_num):
+# 	alleles_truncNZ = np.nonzero(alleles_trunc)
+# 	muts_of_type_truncNZ = np.nonzero(muts_of_type_trunc[i])
+# 	print alleles_truncNZ
+# 	print muts_of_type_truncNZ
+# 	plt.subplot(2, biopsy_num, i+1) 
+# 	plt.bar(alleles_truncNZ, muts_of_type_truncNZ/cell_count_inBx[i], align='center', alpha=0.4)
+# 	plt.xticks(alleles_truncNZ, rotation = 315)
+# 	plt.xlabel('frequecy of clone')	
+# 	plt.xlabel('Unique mutation flag')
+# 	plt.ylim([0, 1])
+# 	plt.title('Biopsy # '+str(i+1)+': Position '+str(biopsy_sites[i]))
+
 ''' plot allele frequncies'''
 
+##TODO USE np.nonzero() to display (within each for loop) only the non-zero elements per biopsy
+
 for i in range(0,biopsy_num):
+	plt.figure()
 	colors = []
 	allele_freq = total_mut_at_site_trunc[i]/cell_count_inBx[i]
-	plt.subplot(2, biopsy_num, i+biopsy_num+1)
+	# plt.subplot(2, biopsy_num, i+biopsy_num+1)
 	for position in range(0,len(total_muts_trunc[i])): 
 		if total_muts_trunc[i][position]==1: 
 			colors.append('r')

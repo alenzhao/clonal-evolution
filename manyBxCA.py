@@ -26,7 +26,6 @@ def sum_digits(digit):
     return sum(int(x) for x in digit if x.isdigit())
 
 def gather_biopsies(biopsy_num, r):
-	#create biopsy site at random
 	while len(biopsy_sites) < biopsy_num:
 		newpoint = [random.randint(r,size-r),random.randint(r,size-r)] #not including over the edge
 		biopsy_sites.append(newpoint)
@@ -62,10 +61,10 @@ SI1 = 0 #placeholders for Shannon Index values
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
 detection_threshold = 0.5 #threshold for detection of clone/allele
 
-
+path = '../andrea_test/non-stem/text/'
 ################ GATHER AND PARSE DATA #################
 #bit string data
-data = open('../andrea_test/non-stem/text/genomes'+str(time)).read().replace(',','\n').replace('\n','')
+data = open(path+'genomes'+str(time)).read().replace(',','\n').replace('\n','')
 x = data.split()
 CA = np.array(x).astype('string')
 Genomes = np.reshape(CA, (size,size))
@@ -75,7 +74,7 @@ mut_array1 = np.reshape(total_mut1, (size,size))
 SIBx = [] #list of shannon indices for each biopsy
 
 #mutation flag data
-data = open('../andrea_test/non-stem/text/carriedMutation'+str(time)).read().replace(',','\n').replace('\n','')
+data = open(path+'carriedMutation'+str(time)).read().replace(',','\n').replace('\n','')
 x = data.split()
 CA = np.array(x).astype('int')
 CM1 = np.reshape(CA, (size,size))
