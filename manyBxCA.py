@@ -27,7 +27,8 @@ def sum_digits(digit):
 
 def gather_biopsies(biopsy_num, r):
 	while len(biopsy_sites) < biopsy_num:
-		newpoint = [random.randint(r,size-r),random.randint(r,size-r)] #not including over the edge
+		# newpoint = [random.randint(r,size-r),random.randint(r,size-r)] #not including over the edge
+		newpoint = [random.randint(0,size),random.randint(0,size)]
 		biopsy_sites.append(newpoint)
 	return biopsy_sites
 
@@ -52,29 +53,30 @@ def do_biopsies(size, biopsy_num, r, CM1, biopsy_sites):
 
 ##################################################################
 
-size = 20 #size of the array
-time = 200
+size = 100 #size of the array
+time = 100
 #pick X random points, then find all the other elements within a range, r, of the point
-biopsy_num = 1000 #desired number of biopsies
-r = 5 #euclidean distance from random point that you include in biopsy
+biopsy_num = 200 #desired number of biopsies
+r = 3 #euclidean distance from random point that you include in biopsy
 SI1 = 0 #placeholders for Shannon Index values
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
-detection_threshold = 0.5 #threshold for detection of clone/allele
 
-path = '../andrea_test/non-stem/text/'
+read_path = '../andrea_test/non-stem/text/'
+write_path = '../figs/multi_bx/'
+
 ################ GATHER AND PARSE DATA #################
-#bit string data
-data = open(path+'genomes'+str(time)).read().replace(',','\n').replace('\n','')
-x = data.split()
-CA = np.array(x).astype('string')
-Genomes = np.reshape(CA, (size,size))
-genomelength = len(Genomes[0][0])
-for entry in range(0, size**2):	total_mut1[entry] = np.array(sum_digits(CA[entry])).astype('int')
-mut_array1 = np.reshape(total_mut1, (size,size))
+# #bit string data
+# data = open(read_path+'genomes'+str(time)).read().replace(',','\n').replace('\n','')
+# x = data.split()
+# CA = np.array(x).astype('string')
+# Genomes = np.reshape(CA, (size,size))
+# genomelength = len(Genomes[0][0])
+# for entry in range(0, size**2):	total_mut1[entry] = np.array(sum_digits(CA[entry])).astype('int')
+# mut_array1 = np.reshape(total_mut1, (size,size))
 SIBx = [] #list of shannon indices for each biopsy
 
 #mutation flag data
-data = open(path+'carriedMutation'+str(time)).read().replace(',','\n').replace('\n','')
+data = open(read_path+'carriedMutation'+str(time)).read().replace(',','\n').replace('\n','')
 x = data.split()
 CA = np.array(x).astype('int')
 CM1 = np.reshape(CA, (size,size))
@@ -87,69 +89,74 @@ SItrunc = float("{0:.4f}".format(SI1))
 #'biopsy' at random some circle of cells
 biopsy_sites = [] #a list of the sites of biopsy - ordered pairs
 biopsied_cells = [] #a list of lists of biopsied cells
-total_muts = np.zeros((biopsy_num,genomelength))
-genomes_inBx = []
+# total_muts = np.zeros((biopsy_num,genomelength))
+# genomes_inBx = []
 muts_inBx = []
-total_mut_at_site = np.zeros((biopsy_num,genomelength))
-muts_of_type = np.zeros((biopsy_num,genomelength))
+# total_mut_at_site = np.zeros((biopsy_num,genomelength))
+# muts_of_type = np.zeros((biopsy_num,genomelength))
 
-### make first point
-point1 = [random.randint(r,size-r),random.randint(r,size-r)] #pick a random position at least r from the edge
-biopsy_sites.append(point1)
+# ### make first point
+# point1 = [random.randint(r,size-r),random.randint(r,size-r)] #pick a random position at least r from the edge
+# biopsy_sites.append(point1)
 
+
+### PLOT
 rcParams['figure.figsize'] = 11,11
 
 '''plot histogram radius #1'''
 
-r = 3
-biopsy_sites = gather_biopsies(biopsy_num,r)
-SIBx = do_biopsies(size, biopsy_num, r, CM1, biopsy_sites)
+r1 = 15
+biopsy_sites = gather_biopsies(biopsy_num,r1)
+SIBx = do_biopsies(size, biopsy_num, r1, CM1, biopsy_sites)
+meanBx1 = np.mean(SIBx)
+stdBx1 = np.std(SIBx)
+# skewBx1 = np.skew(SIBx)
 
 plt.subplot(2,2,3)
 plt.hist(SIBx)
 plt.xlabel('Shannon Index')	
 plt.ylabel('frequency')
-plt.title('Shannon Indices of '+str(biopsy_num)+' biopsies w/ radius '+str(r)+'. Tumour SI='+str(-SItrunc))
+plt.title('S.I.s bxs of r = '+str(r1)+ ' \n mean:'+str(meanBx1)[:4]+' std:'+str(stdBx1)[:4])
 
 plt.subplot(2,2,1)
 ax1 = plt.pcolor(CM1, cmap='nipy_spectral', vmin = 0.001)
-plt.colorbar()
-# initialize axis, important: set the aspect ratio to equal
-plt.title('Shannon Index: '+str(-SItrunc))
+# plt.colorbar()
+plt.title('Tumor size: '+str(N1)+' cells')
 x,y = zip(*biopsy_sites)
-# loop through all triplets of x-,y-coordinates and radius and
-# plot a circle for each:
+# loop through all triplets of x-,y-coordinates and radius and plot a circle for each:
 for x, y in zip(x, y):
-    plt.gca().add_artist(Circle(xy=(x, y), radius=r, alpha = 1, fill = False, color = 'k'))
+    plt.gca().add_artist(Circle(xy=(x, y), radius=r1, alpha = 1, fill = False, color = 'w'))
 plt.xlim([0, size])
 plt.ylim([0, size])
 
 '''plot histogram radius #2'''
 
-r = 5
-biopsy_sites = gather_biopsies(biopsy_num,r)
-SIBx = do_biopsies(size, biopsy_num, r, CM1, biopsy_sites)
+r2 = 20
+biopsy_sites = []
+biopsy_sites = gather_biopsies(biopsy_num,r2)
+SIBx = [] #list of shannon indices for each biopsy
+SIBx = do_biopsies(size, biopsy_num, r2, CM1, biopsy_sites)
+meanBx2 = np.mean(SIBx)
+stdBx2 = np.std(SIBx)
+# skewBx2 = np.skew(SIBx)
 
 plt.subplot(2,2,4)
 plt.hist(SIBx)
 plt.xlabel('Shannon Index')	
 plt.ylabel('frequency')
-plt.title('Shannon Indices of '+str(biopsy_num)+' biopsies w/ radius '+str(r)+'. Tumour SI='+str(-SItrunc))
-
+plt.title('S.I.s bxs of r = '+str(r2)+' \n mean:' +str(meanBx2)[:4]+' std:'+str(stdBx2)[:4])
 
 '''PLOT associated CA and biopsy areas'''
 
 plt.subplot(2,2,2)
 ax1 = plt.pcolor(CM1, cmap='nipy_spectral', vmin = 0.001)
 plt.colorbar()
-# initialize axis, important: set the aspect ratio to equal
 plt.title('Shannon Index: '+str(-SItrunc))
 x,y = zip(*biopsy_sites)
-# loop through all triplets of x-,y-coordinates and radius and
-# plot a circle for each:
 for x, y in zip(x, y):
-    plt.gca().add_artist(Circle(xy=(x, y), radius=r, alpha = 1, fill = False, color = 'k'))
+    plt.gca().add_artist(Circle(xy=(x, y), radius=r2, alpha = 1, fill = False, color = 'w'))
 plt.xlim([0, size])
 plt.ylim([0, size])
 
-plt.show()
+plt.savefig(write_path+str(biopsy_num)+'Bx_N'+str(r1)+'_'+str(r2)+'.png', dpi = 500)
+# plt.show()

@@ -20,7 +20,7 @@ def shannon(n, N):
 def sum_digits(digit):
     return sum(int(x) for x in digit if x.isdigit())
 
-size = 200 #size of the array
+size = 100 #size of the array
 t1 = 50
 t2 = 100
 SI1 = 0 #placeholders for Shannon Index values

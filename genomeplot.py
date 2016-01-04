@@ -11,7 +11,7 @@ from pylab import rcParams
 my_cmap = plt.cm.get_cmap('nipy_spectral')
 my_cmap.set_under('w')
 
-size = 200 #size of the array
+size = 100 #size of the array
 time = 100
 total_mut1 = np.zeros(size**2)
 
@@ -35,18 +35,27 @@ x = data.split()
 CA = np.array(x).astype('int')
 CM1 = np.reshape(CA, (size,size))
 
-rcParams['figure.figsize'] = 15,5
+rcParams['figure.figsize'] = 10,10
 
-plt.subplot(1,3,1)
+plt.subplot(2,2,1)
+# plt.figure()
 plt.pcolor(mut_array1, cmap='nipy_spectral', vmin = 0.001)
 plt.title('ts '+str(time)+' - mut distance')
 plt.colorbar()
 
-plt.subplot(1,3,2)
+plt.subplot(2,2,2)
+# plt.figure()
 plt.pcolor(CM1, cmap='nipy_spectral', vmin = 0.001)
 plt.title('ts '+str(time)+' - unique muts')
 plt.colorbar()
 
-plt.subplot(1,3,3)
+plt.subplot(2,2,3)
+# plt.figure()
+plt.hist(total_mut1, normed=True)
+# plt.yscale('log')
+
+plt.subplot(2,2,4)
+# plt.figure()
 plt.hist(CM1, normed=True)
+# plt.yscale('log')
 plt.show()
