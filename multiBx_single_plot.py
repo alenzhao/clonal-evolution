@@ -103,7 +103,7 @@ for i in range(1,r_sweep+1):
 
 bins = np.linspace(0, np.max(data), 100)
 n, bins, patches = P.hist([data[i] for i in range(0,r_sweep)], 10, histtype = 'bar', \
-	label = ['r= '+str(i)+' mean:'+str(meanBx[i])[:4]+' std:'+str(stdBx[i])[:4] for i in range(0,r_sweep)])
+	label = ['r= '+str(2*i)+' mean:'+str(meanBx[i])[:4]+' std:'+str(stdBx[i])[:4] for i in range(0,r_sweep)])
 P.legend(loc = 'upper right')
 P.xlabel('Shannon Index')	
 P.ylabel('frequency')
