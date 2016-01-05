@@ -43,6 +43,7 @@ def do_biopsies(size, biopsy_num, r, CM1, biopsy_sites):
 				a = (row,column)
 				if distance.euclidean(a,punch) <= r: 
 					biopsy_Mutlist_temp.append(CM1[column][row])
+					
 		cell_count_inBx[bx] = len(biopsy_Mutlist_temp)
 		SIBx_temp = 0
 		for x in range (0, np.amax(biopsy_Mutlist_temp)):
@@ -53,16 +54,16 @@ def do_biopsies(size, biopsy_num, r, CM1, biopsy_sites):
 
 ##################################################################
 
-size = 100 #size of the array
-time = 100
+size = 1000 #size of the array
+time = 1000
 #pick X random points, then find all the other elements within a range, r, of the point
-biopsy_num = 200 #desired number of biopsies
-r = 3 #euclidean distance from random point that you include in biopsy
+biopsy_num = 100 #desired number of biopsies
+r = 10 #euclidean distance from random point that you include in biopsy
 SI1 = 0 #placeholders for Shannon Index values
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
 
-read_path = '../andrea_test/non-stem/text/'
-write_path = '../figs/multi_bx/'
+read_path = '../../../../Thesis/phylogenies/experiment/non-stem/text/'
+write_path = '../figs/andrea_flat/'
 
 ################ GATHER AND PARSE DATA #################
 # #bit string data
@@ -105,7 +106,7 @@ rcParams['figure.figsize'] = 11,11
 
 '''plot histogram radius #1'''
 
-r1 = 15
+r1 = 30
 biopsy_sites = gather_biopsies(biopsy_num,r1)
 SIBx = do_biopsies(size, biopsy_num, r1, CM1, biopsy_sites)
 meanBx1 = np.mean(SIBx)
@@ -131,7 +132,7 @@ plt.ylim([0, size])
 
 '''plot histogram radius #2'''
 
-r2 = 20
+r2 = 40
 biopsy_sites = []
 biopsy_sites = gather_biopsies(biopsy_num,r2)
 SIBx = [] #list of shannon indices for each biopsy
