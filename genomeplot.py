@@ -1,5 +1,5 @@
 '''
-Plotting mutational load and allele frequency
+Plotting mutational load and allele frequency of entire tumor
 
 Jacob Scott 21 Decemeber 2015
 

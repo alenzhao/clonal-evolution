@@ -1,6 +1,10 @@
 '''
 Plotting CA, mutation map and mutational age.
 
+For multiple biopsies plot allele frequency and detected alleles
+
+detection_threshold tunable, as is biopsy_num and biopsy radius (r)
+
 Jacob Scott 23 December 2015
 
 '''

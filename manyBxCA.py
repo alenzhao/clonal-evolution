@@ -28,7 +28,7 @@ def sum_digits(digit):
 def gather_biopsies(biopsy_num, r):
 	while len(biopsy_sites) < biopsy_num:
 		# newpoint = [random.randint(r,size-r),random.randint(r,size-r)] #not including over the edge
-		newpoint = [random.randint(0,size),random.randint(0,size)]
+		newpoint = [random.randint(0,size),random.randint(0,size)] #overlap OK
 		biopsy_sites.append(newpoint)
 	return biopsy_sites
 
