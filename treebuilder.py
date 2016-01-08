@@ -4,20 +4,40 @@ Jacob Scott 26 Dec 2015 '''
 
 
 import numpy as np
-from ete3 import Tree, ClusterTree
+from ete3 import Tree, TreeStyle, NodeStyle, faces, AttrFace, CircleFace
 from collections import Counter
+from math import log as ln
 
 read_path1 = '../../../../Thesis/phylogenies/experiment/non-stem/'
 read_path = '../andrea_test/non-stem/'
+
+
+def layout(node):
+    if node.is_leaf():
+        # Add node name to leaf nodes
+        N = AttrFace("name", fsize=14, fgcolor="black")
+        faces.add_face_to_node(N, node, 0)
+    if "weight" in node.features:
+        # Creates a sphere face whose size is proportional to node's
+        # feature "weight"
+        C = CircleFace(radius=node.weight, color="RoyalBlue", style="sphere")
+        # Let's make the sphere transparent
+        C.opacity = 0.3
+        # And place as a float face over the tree
+        faces.add_face_to_node(C, node, 0, position="float")
+
+def sort_pairs(pair):
+    # Extract integer after "r".
+    return int(pair[0][1:])
 
 data = open(read_path+'output4k_size500.txt').read().replace(',',' ').replace('\n',' ')
 x = data.split()
 ParentChild = np.array(x).astype('str')
 y = len(ParentChild)/3
 ParentChild1 = np.reshape(ParentChild, (y,3))
-
 firsttwo = ParentChild1[:,0:2]
 parents = []
+children = []
 
 for row in range(0, len(firsttwo)): 
 	for column in range(0,2): 
@@ -28,10 +48,6 @@ t = Tree() # Creates an empty tree
 r1 = t.add_child(name="r1")
 lookup = {"r1": r1}
 prune_list = ['r1']
-
-def sort_pairs(pair):
-    # Extract integer after "r".
-    return int(pair[0][1:])
 
 for pair in sorted(firsttwo, key=sort_pairs):
     parentname = pair[0]
@@ -44,16 +60,40 @@ for pair in sorted(firsttwo, key=sort_pairs):
             if parentname not in parents:
                 prune_list.append(lookup[parentname])
             parents.append(parentname) #make list of unique terminal nodes (no children of children)
+            children.append(newchild)
         else:
             raise RuntimeError('Must not happen.')
 
 '''make a list of all leaves with no children, count them and then prune the tree of all leaves '''
-prune_count = Counter(parents) #counter than contains the number of children that each terminal node has
-# print (prune_count)
-# print (prune_list)
+prune_count = Counter(children) #counter than contains the number of children that each terminal node has
+print(children)
+print(parents)
+# print(prune_count)
+# print(prune_count)
+# print(prune_count['r1'])
+for key in prune_count.keys():
+    node_weight = ln(prune_count[key])
+    # node_weight = ln(n_children)
+    # print(node_weight,n_children)
+    node = lookup[key]
+    node.add_features(weight=node_weight)
+# for n in t.traverse():
+#     # print(lookup)
+#     n.add_features(weight=prune_count[lookup])
 t.prune(prune_list)
-t.ladderize()
-print (t.get_ascii(show_internal=True))
-#
-# t.show()
+# Create an empty TreeStyle
+ts = TreeStyle()
+# Set our custom layout function
+ts.layout_fn = layout
+# Draw a tree
+ts.mode = "c"
+# We will add node names manually
+ts.show_leaf_name = False
+# Show branch data
+ts.show_branch_length = True
+ts.show_branch_support = True
 
+
+# print (t.get_ascii(show_internal=True))
+
+t.show(tree_style=ts)
