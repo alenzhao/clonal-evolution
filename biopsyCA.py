@@ -45,10 +45,11 @@ SI1 = 0 #placeholders for Shannon Index values
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
 detection_threshold = 0.6 #threshold for detection of clone/allele
 
-path = '../andrea_test/non-stem/text/'
+read_path = '../andrea_test/non-stem/text/'
+write_path = '../andrea_test/non-stem/figs/'
 
 #bit string data
-data = open(path+'genomes'+str(time)).read().replace(',','\n').replace('\n','')
+data = open(read_path+'genomes'+str(time)).read().replace(',','\n').replace('\n','')
 x = data.split()
 CA = np.array(x).astype('string')
 Genomes = np.reshape(CA, (size,size))
@@ -57,7 +58,7 @@ for entry in range(0, size**2):	total_mut1[entry] = np.array(sum_digits(CA[entry
 mut_array1 = np.reshape(total_mut1, (size,size))
 
 #mutation flag data
-data = open(path+'carriedMutation'+str(time)).read().replace(',','\n').replace('\n','')
+data = open(read_path+'carriedMutation'+str(time)).read().replace(',','\n').replace('\n','')
 x = data.split()
 CA = np.array(x).astype('int')
 CM1 = np.reshape(CA, (size,size))
@@ -198,4 +199,6 @@ for x, y in zip(x, y):
 plt.xlim([0, size])
 plt.ylim([0, size])
 
-plt.show()
+plt.savefig(write_path+str(biopsy_num)+'Bx_AlleleFreq r= '+str(r)+'.png', dpi = 500)
+
+# plt.show()
