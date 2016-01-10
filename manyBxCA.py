@@ -28,24 +28,26 @@ def sum_digits(digit):
 def gather_biopsies(biopsy_num, r):
 	while len(biopsy_sites) < biopsy_num:
 		# newpoint = [random.randint(r,size-r),random.randint(r,size-r)] #not including over the edge
-		newpoint = [random.randint(0,size),random.randint(0,size)] #overlap OK
+		newpoint = [random.randint(0,size),random.randint(0,size)] #overlap OK, over edge ok
 		biopsy_sites.append(newpoint)
 	return biopsy_sites
 
-def do_biopsies(size, biopsy_num, r, CM1, biopsy_sites): 
+def do_biopsies_smarter(size, biopsy_num, r, CM1, biopsy_sites):
+	area = 4*r**2
+	biopsy_Mutlist = np.zeros((biopsy_num,area)).astype('int')
 	cell_count_inBx = np.zeros(biopsy_num)
+	for row in range(0, size):
+		for column in range(0, size):
+			a = (row,column)
+			for bx in range(0, biopsy_num):
+				punch = biopsy_sites[bx]
+				if distance.euclidean(a,punch) <= r:
+					biopsy_Mutlist[bx][cell_count_inBx[bx]] = CM1[column][row]
+					cell_count_inBx[bx] += 1
 	for bx in range(0, biopsy_num):
-		biopsy_Mutlist_temp = [] # for the mutation flags
-		muts_inBx_temp = []
-		punch = biopsy_sites[bx]
-		for row in range(0, size):
-			for column in range(0, size):
-				a = (row,column)
-				if distance.euclidean(a,punch) <= r: 
-					biopsy_Mutlist_temp.append(CM1[column][row])
-					
-		cell_count_inBx[bx] = len(biopsy_Mutlist_temp)
 		SIBx_temp = 0
+		biopsy_Mutlist_temp = (biopsy_Mutlist[bx])[0:cell_count_inBx[bx]]
+		# print biopsy_Mutlist_temp
 		for x in range (0, np.amax(biopsy_Mutlist_temp)):
 			SIBx_temp += shannon(np.bincount(biopsy_Mutlist_temp)[x],cell_count_inBx[bx])
 		SIBx_temp = float("{0:.3f}".format(SIBx_temp))
@@ -54,16 +56,16 @@ def do_biopsies(size, biopsy_num, r, CM1, biopsy_sites):
 
 ##################################################################
 
-size = 1000 #size of the array
-time = 1000
+size = 100 #size of the array
+time = 100
 #pick X random points, then find all the other elements within a range, r, of the point
-biopsy_num = 100 #desired number of biopsies
+biopsy_num = 10 #desired number of biopsies
 r = 10 #euclidean distance from random point that you include in biopsy
 SI1 = 0 #placeholders for Shannon Index values
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
 
-read_path = '../../../../Thesis/phylogenies/experiment/non-stem/text/'
-write_path = '../figs/andrea_flat/'
+read_path = '../andrea_test/non-stem/text/'
+write_path = '../andrea_test/non-stem/figs/'
 
 ################ GATHER AND PARSE DATA #################
 # #bit string data
@@ -106,9 +108,9 @@ rcParams['figure.figsize'] = 11,11
 
 '''plot histogram radius #1'''
 
-r1 = 30
+r1 = 3
 biopsy_sites = gather_biopsies(biopsy_num,r1)
-SIBx = do_biopsies(size, biopsy_num, r1, CM1, biopsy_sites)
+SIBx = do_biopsies_smarter(size, biopsy_num, r1, CM1, biopsy_sites)
 meanBx1 = np.mean(SIBx)
 stdBx1 = np.std(SIBx)
 # skewBx1 = np.skew(SIBx)
@@ -132,7 +134,7 @@ plt.ylim([0, size])
 
 '''plot histogram radius #2'''
 
-r2 = 40
+r2 = 5
 biopsy_sites = []
 biopsy_sites = gather_biopsies(biopsy_num,r2)
 SIBx = [] #list of shannon indices for each biopsy
@@ -151,7 +153,7 @@ plt.title('S.I.s bxs of r = '+str(r2)+' \n mean:' +str(meanBx2)[:4]+' std:'+str(
 
 plt.subplot(2,2,2)
 ax1 = plt.pcolor(CM1, cmap='nipy_spectral', vmin = 0.001)
-plt.colorbar()
+# plt.colorbar()
 plt.title('Shannon Index: '+str(-SItrunc))
 x,y = zip(*biopsy_sites)
 for x, y in zip(x, y):
