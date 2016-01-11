@@ -32,10 +32,12 @@ def gather_biopsies(biopsy_num, r):
 		biopsy_sites.append(newpoint)
 	return biopsy_sites
 
-def do_biopsies(size, biopsy_num, r, CM1, biopsy_sites):
+def do_biopsies_aggregate(size, biopsy_num, r, CM1, biopsy_sites):
 	area = 4*r**2
 	biopsy_Mutlist = np.zeros((biopsy_num,area)).astype('int')
+	aggregate_biopsy = np.array([]).astype('int')
 	cell_count_inBx = np.zeros(biopsy_num)
+	SIBx_agg = 0
 	for row in range(0, size):
 		for column in range(0, size):
 			a = (row,column)
@@ -43,7 +45,8 @@ def do_biopsies(size, biopsy_num, r, CM1, biopsy_sites):
 				punch = biopsy_sites[bx]
 				if distance.euclidean(a,punch) <= r:
 					biopsy_Mutlist[bx][cell_count_inBx[bx]] = CM1[column][row]
-					cell_count_inBx[bx] += 1
+					cell_count_inBx[bx] += 1 
+					aggregate_biopsy = np.append(aggregate_biopsy,CM1[column][row])
 	for bx in range(0, biopsy_num):
 		SIBx_temp = 0
 		biopsy_Mutlist_temp = (biopsy_Mutlist[bx])[0:cell_count_inBx[bx]]
@@ -52,14 +55,17 @@ def do_biopsies(size, biopsy_num, r, CM1, biopsy_sites):
 			SIBx_temp += shannon(np.bincount(biopsy_Mutlist_temp)[x],cell_count_inBx[bx])
 		SIBx_temp = float("{0:.3f}".format(SIBx_temp))
 		SIBx.append(-SIBx_temp)
-	return SIBx
+	for x in range (0, np.amax(aggregate_biopsy)):
+		SIBx_agg += shannon(np.bincount(aggregate_biopsy)[x],np.sum(cell_count_inBx))
+	SIBx_agg = float("{0:.3f}".format(SIBx_agg))
+	return SIBx, -SIBx_agg
 
 ##################################################################
 
 size = 100 #size of the array
-time = 100
+time = 500
 #pick X random points, then find all the other elements within a range, r, of the point
-biopsy_num = 10 #desired number of biopsies
+biopsy_num = 20 #desired number of biopsies
 r = 10 #euclidean distance from random point that you include in biopsy
 SI1 = 0 #placeholders for Shannon Index values
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
@@ -68,14 +74,6 @@ read_path = '../andrea_test/non-stem/text/'
 write_path = '../andrea_test/non-stem/figs/'
 
 ################ GATHER AND PARSE DATA #################
-# #bit string data
-# data = open(read_path+'genomes'+str(time)).read().replace(',','\n').replace('\n','')
-# x = data.split()
-# CA = np.array(x).astype('string')
-# Genomes = np.reshape(CA, (size,size))
-# genomelength = len(Genomes[0][0])
-# for entry in range(0, size**2):	total_mut1[entry] = np.array(sum_digits(CA[entry])).astype('int')
-# mut_array1 = np.reshape(total_mut1, (size,size))
 SIBx = [] #list of shannon indices for each biopsy
 
 #mutation flag data
@@ -91,34 +89,29 @@ SItrunc = float("{0:.4f}".format(SI1))
 
 #'biopsy' at random some circle of cells
 biopsy_sites = [] #a list of the sites of biopsy - ordered pairs
-biopsied_cells = [] #a list of lists of biopsied cells
-# total_muts = np.zeros((biopsy_num,genomelength))
-# genomes_inBx = []
-muts_inBx = []
-# total_mut_at_site = np.zeros((biopsy_num,genomelength))
-# muts_of_type = np.zeros((biopsy_num,genomelength))
-
-# ### make first point
-# point1 = [random.randint(r,size-r),random.randint(r,size-r)] #pick a random position at least r from the edge
-# biopsy_sites.append(point1)
-
 
 ### PLOT
 rcParams['figure.figsize'] = 11,11
 
-'''plot histogram radius #1'''
+'''plot histogram unaggregated biopsies, radius #1'''
 
-r1 = 3
+r1 = 5
 biopsy_sites = gather_biopsies(biopsy_num,r1)
-SIBx = do_biopsies(size, biopsy_num, r1, CM1, biopsy_sites)
+SIBx, SIBx_agg = do_biopsies_aggregate(size, biopsy_num, r1, CM1, biopsy_sites)
 meanBx1 = np.mean(SIBx)
 stdBx1 = np.std(SIBx)
-# skewBx1 = np.skew(SIBx)
+plt.subplot(2,2,4)
+# plt.hist(SIBx, SIBx_agg, 10, histtype = 'bar')
+weights = np.ones_like(SIBx)/len(SIBx)
+bins = np.linspace(0, np.max(SIBx), 100)
+n, bins, patches = plt.hist(SIBx, 10, histtype = 'bar', weights = weights)
+n, bins, patches = plt.hist(SIBx_agg, 10, histtype = 'bar', alpha = 0.7, color = 'r', \
+	label = ('Aggregate, SI = '+str(SIBx_agg)))
 
-plt.subplot(2,2,3)
-plt.hist(SIBx)
 plt.xlabel('Shannon Index')	
 plt.ylabel('frequency')
+plt.ylim([0, 1.2])
+plt.legend(loc = 'upper center')
 plt.title('S.I.s bxs of r = '+str(r1)+ ' \n mean:'+str(meanBx1)[:4]+' std:'+str(stdBx1)[:4])
 
 plt.subplot(2,2,1)
@@ -138,15 +131,20 @@ r2 = 5
 biopsy_sites = []
 biopsy_sites = gather_biopsies(biopsy_num,r2)
 SIBx = [] #list of shannon indices for each biopsy
-SIBx = do_biopsies(size, biopsy_num, r2, CM1, biopsy_sites)
+SIBx, SIBx_agg = do_biopsies_aggregate(size, biopsy_num, r2, CM1, biopsy_sites)
 meanBx2 = np.mean(SIBx)
 stdBx2 = np.std(SIBx)
-# skewBx2 = np.skew(SIBx)
 
-plt.subplot(2,2,4)
-plt.hist(SIBx)
+plt.subplot(2,2,3)
+bins = np.linspace(0, np.max(SIBx), 100)
+n, bins, patches = plt.hist(SIBx, 10, histtype = 'bar', weights = weights)
+n, bins, patches = plt.hist(SIBx_agg, 10, histtype = 'bar', alpha = 0.7, color = 'r', \
+	label = ('Aggregate, SI = '+str(SIBx_agg)))
+
 plt.xlabel('Shannon Index')	
 plt.ylabel('frequency')
+plt.ylim([0, 1.2])
+plt.legend(loc = 'upper center')
 plt.title('S.I.s bxs of r = '+str(r2)+' \n mean:' +str(meanBx2)[:4]+' std:'+str(stdBx2)[:4])
 
 '''PLOT associated CA and biopsy areas'''
@@ -161,5 +159,5 @@ for x, y in zip(x, y):
 plt.xlim([0, size])
 plt.ylim([0, size])
 
-plt.savefig(write_path+str(biopsy_num)+'Bx_N'+str(r1)+'_'+str(r2)+'.png', dpi = 500)
+plt.savefig(write_path+'Indiv_vs_Aggreg Bx_N'+str(r1)+'.png', dpi = 500)
 # plt.show()

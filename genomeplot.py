@@ -11,14 +11,15 @@ from pylab import rcParams
 my_cmap = plt.cm.get_cmap('nipy_spectral')
 my_cmap.set_under('w')
 
-size = 1000 #size of the array
-time = 1000
+size = 100 #size of the array
+time = 500
 total_mut1 = np.zeros(size**2)
 
 def sum_digits(digit):
     return sum(int(x) for x in digit if x.isdigit())
 
-read_path = '../../../../Thesis/phylogenies/experiment/non-stem/text/'
+# read_path = '../../../../Thesis/phylogenies/experiment/non-stem/text/'
+read_path = 'text/'
 write_path = '../figs/andrea_flat/'
 
 #bit string data
@@ -62,6 +63,6 @@ plt.subplot(2,2,4)
 plt.hist(CM1, normed=True)
 # plt.yscale('log')
 
-plt.savefig(write_path+'Allele_freq_plot_NS_time'+str(time)+'D0_MF5em4_size1k.png', dpi = 500)
+plt.savefig(write_path+'Allele_freq_plot_NS_time'+str(time)+'D0_MF5em4_size1c.png', dpi = 500)
 
 # plt.show()
