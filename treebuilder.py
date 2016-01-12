@@ -4,25 +4,26 @@ Jacob Scott 26 Dec 2015 '''
 
 
 import numpy as np
-from ete3 import Tree, TreeStyle, NodeStyle, faces, AttrFace, CircleFace
+from ete3 import Tree, TreeStyle, NodeStyle, faces, AttrFace, CircleFace, TextFace
 from collections import Counter
 from math import log as ln
+import random as random
 
-read_path1 = '../../../../Thesis/phylogenies/experiment/non-stem/'
-read_path = '../andrea_test/non-stem/'
+# read_path1 = '../../../../Thesis/phylogenies/experiment/non-stem/'
+read_path = '../andrea_test/stem/'
 
 
 def layout(node):
-    if node.is_leaf():
-        # Add node name to leaf nodes
-        N = AttrFace("name", fsize=14, fgcolor="black")
-        faces.add_face_to_node(N, node, 0)
+    # if node.is_leaf():
+    #     # Add node name to leaf nodes
+    #     N = AttrFace("name", fsize=14, fgcolor="black")
+    #     faces.add_face_to_node(N, node, 0)
     if "weight" in node.features:
         # Creates a sphere face whose size is proportional to node's
         # feature "weight"
         C = CircleFace(radius=node.weight, color="RoyalBlue", style="sphere")
         # Let's make the sphere transparent
-        C.opacity = 0.3
+        C.opacity = 0.6
         # And place as a float face over the tree
         faces.add_face_to_node(C, node, 0, position="float")
 
@@ -30,12 +31,12 @@ def sort_pairs(pair):
     # Extract integer after "r".
     return int(pair[0][1:])
 
-data = open(read_path+'output4k_size500.txt').read().replace(',',' ').replace('\n',' ')
+data = open(read_path+'stemsym6l4t5k.txt').read().replace(',',' ').replace('\n',' ')
 x = data.split()
 ParentChild = np.array(x).astype('str')
 y = len(ParentChild)/3
 ParentChild1 = np.reshape(ParentChild, (y,3))
-firsttwo = ParentChild1[:,0:2]
+firsttwo = ParentChild1[:,0:2] #chops off first line which encodes parameters of simulation and third column which is not yet used
 parents = []
 children = []
 
@@ -65,21 +66,19 @@ for pair in sorted(firsttwo, key=sort_pairs):
             raise RuntimeError('Must not happen.')
 
 '''make a list of all leaves with no children, count them and then prune the tree of all leaves '''
-prune_count = Counter(children) #counter than contains the number of children that each terminal node has
-print(children)
-print(parents)
-# print(prune_count)
-# print(prune_count)
-# print(prune_count['r1'])
-for key in prune_count.keys():
-    node_weight = ln(prune_count[key])
-    # node_weight = ln(n_children)
-    # print(node_weight,n_children)
-    node = lookup[key]
-    node.add_features(weight=node_weight)
-# for n in t.traverse():
-#     # print(lookup)
-#     n.add_features(weight=prune_count[lookup])
+prune_count = Counter(children) #counter than contains the number of children that each terminal node has]
+# print(parents)
+# print(prune_list)
+print(prune_count)
+# for key in prune_count.keys():
+#     # node_weight = ln(prune_count[key])
+#     # node_weight = ln(n_children)
+#     # print(node_weight,n_children)
+#     # node = lookup[key]
+#     node.add_features(weight=random.randint(50))
+for n in t.traverse():
+    n.add_face(TextFace(n.name, fsize = 16), column=0, position="branch-bottom")
+    n.add_features(weight=random.randint(0,20))
 t.prune(prune_list)
 # Create an empty TreeStyle
 ts = TreeStyle()
@@ -87,10 +86,11 @@ ts = TreeStyle()
 ts.layout_fn = layout
 # Draw a tree
 ts.mode = "c"
-# We will add node names manually
+# False need to add node names manually
 ts.show_leaf_name = False
+
 # Show branch data
-ts.show_branch_length = True
+ts.show_branch_length = False
 ts.show_branch_support = True
 
 
