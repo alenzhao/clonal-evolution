@@ -31,11 +31,11 @@ public class CA3 {
 	Bag cellList = null; // Used in the iterateCells method. Defined here for performance issues
 	boolean finishedRun = false;
 	int mutationNum = 1;  // counter for mutations, starts with 1 which represents the mutation of the first cancer cell
-	float mutfreq = 0.01f; // frequency of mutation
-	float deathprob = 0.01f;
+	float mutfreq = 0.2f; // frequency of mutation
+	float deathprob = 0.0f;
 	StringBuilder [][] carriedGenome = null; // instantiating carriedGenome
 	StringBuilder initGenome;
-	int lengthGenome = 1000;
+	int lengthGenome = 200;
 	//Hashtable<Integer, Integer> tree;
 	//Hashtable<Integer, Integer> timeTree;
 	StringBuilder genomeToMod = new StringBuilder();
@@ -44,13 +44,13 @@ public class CA3 {
         // Vascular initialization
 		//int spacing = 12; // for equal vascular spacing
     	//int vesselNumber = 50; // number of vessels to seed in alternative formulation
-		int size = 100; //8*spacing+1; // Size of the system lattice
+		int size = 200; //8*spacing+1; // Size of the system lattice
         int centre = size/2; //find centre of lattice
 		int timestep = 0; // Current Number of timesteps in the simulation
         //int o2perTS = 2304; // 230400 Times we iterate oxygen per cell time step
 		int dataWriteStartTime = 1; // when we start writing down the data
-        int dataWriteStep = 500; // how often we write down the data
-        int dataReportStep = 500; // how often we print the data
+        int dataWriteStep = 450; // how often we write down the data
+        int dataReportStep = 450; // how often we print the data
         //float consumption_rate = 0.0f; //usually 1
 
 
@@ -61,9 +61,9 @@ public class CA3 {
         //float Km = 0.01f; // Michaelis-Menten kinetic parameter
 		float initOxygen = 1.0f;
 		float[] proliferation = {
-		0.025f,  /* healthy cells */ 
-		0.05f, /* stem cells*/
-		0.05f, /* progenitor cells */
+		0.25f,  /* healthy cells */ 
+		0.5f, /* stem cells*/
+		0.5f, /* progenitor cells */
 		0.0f, /*mature/differentiated cells */
 		0.0f, /*necrotic area */ // added this cell type
 						};
@@ -105,6 +105,8 @@ public class CA3 {
 	//int[][] TACBirthCounter = null; // tracks total TAC births at a position over time
 	//int[][] TACDeathCounter = null; // tracks total TAC deaths at a position over time
 	int[][] carriedmutation = null; // tracks most recent parental mutation at position [i][j] over time
+	int stem_cells_this_TS = 0; // counter to track population dynamics
+	int non_stem_cells_this_TS = 0; // counter to track population dynamics
 
 /*
 	// ******
@@ -277,6 +279,7 @@ public class CA3 {
         genomeToMod.setCharAt(mutationNum-1,'1'); //  daughter carries new carriedGenome
         carriedGenome[centre][centre] = genomeToMod;
 
+
 		//genomeToMod = carriedGenome[centre][centre];
 	}
 
@@ -316,14 +319,13 @@ public class CA3 {
 	
 	public void nextTimeStep ()
 	{
-	    // if (timestep==1000)   //zeros out vasculature at t=1000
-        // for (int i=0;i<size;i++)
-		// for (int j=0;j<size;j++) Vasculature[i][j]=0;
 		births = 0;
 		deaths = 0;
 //		for (int i=0;i<o2perTS;i++) iterateOxygen();  // oh dear
 		iterateCells();
 		radiotherapy = false;
+		stem_cells_this_TS = 0; // counter to track population dynamics
+		non_stem_cells_this_TS = 0; // counter to track population dynamics
 		
 		//NEW
 		int totalCells = 0;
@@ -470,20 +472,21 @@ public class CA3 {
     // main CELL CA loop************
 	public boolean iterateCells()
  	{
-
 /*
 	// modify consumption matrix
 	    	for (int i=0;i<size;i++)
 	        for (int j=0;j<size;j++) consumption[i][j] = consumptionBasal[Cells[i][j]];
 */				
 	//
-		if (cellList==null) cellList = new Bag (size*size); 
+		if (cellList==null) cellList = new Bag (size*size);
 		for (int i = 0; i < size; i++)
 			for (int j = 0; j < size; j++) {
 			    if (Cells[i][j] < 4 )  { // All tumour cell types have Cell > 0, now 0 corresponds to 'healthy cells' that consume at basal rate only 
 					int[] p = new int[2];
 					p[0] = i; p[1] = j;
 					cellList.add(p);
+					if (Cells[i][j] == 1) {stem_cells_this_TS++;}
+					else if (Cells[i][j] == 2 || Cells[i][j] == 3) {non_stem_cells_this_TS++;}
 				}
 			}
 
@@ -563,7 +566,7 @@ public class CA3 {
                             	carriedGenome[daughter[0]][daughter[1]]=carriedGenome[rI][rJ]; //inherit mutational status of parent
                             		if (mutfreq>random.nextFloat()) { // small chance of mutation
                             			mutationNum++; // advance mutation number
-                            			System.out.println (+carriedmutation[rI][rJ]+", "+mutationNum+", "+timestep); // print (parent,child) pair
+                            			System.out.println (+carriedmutation[rI][rJ]+", "+mutationNum+", "+stem_cells_this_TS+", "+non_stem_cells_this_TS+", "+timestep); // print (parent,child) pair
                             			//tree.put(carriedmutation[rI][rJ], mutationNum);
                             			//timeTree.put(mutationNum, timestep); // hash table stuff
                             			if (0.5>random.nextFloat()) {
