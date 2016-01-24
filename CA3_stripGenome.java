@@ -370,8 +370,8 @@ public class CA3 {
         //PrintWriter outTable = new PrintWriter(outFileHm);  // new
 
                 // carriedGenome
-        //FileWriter outFilecG = new FileWriter("./text/genomes"+timestep); // new
-        //PrintWriter outcG = new PrintWriter(outFilecG);  // new
+        FileWriter outFilecG = new FileWriter("./text/genomes"+timestep); // new
+        PrintWriter outcG = new PrintWriter(outFilecG);  // new
 
                 // attempt at hashtable
         //FileWriter outFileHm2 = new FileWriter("./text/timepairs"+timestep); // new
@@ -430,7 +430,7 @@ public class CA3 {
                 for (int i=0;i<size;i++) {
                     for (int j=0;j<size;j++){
 					outCells.print(Cells[i][j]+", ");
-					//outcG.print(carriedGenome[i][j]+", ");
+					outcG.print(carriedGenome[i][j]+", ");
                    		//outO2.print(Oxygen[i][j]+", ");
                         //outSBC.print(stemBirthCounter[i][j]+", ");
 					outCM.print(carriedmutation[i][j]+", ");
@@ -441,7 +441,7 @@ public class CA3 {
 
                     }
                     	outCells.println("");
-                    	//outcG.println("");
+                    	outcG.println("");
                     	outCM.println("");
                	    	//outO2.println("");
                     	//outSBC.println("");
@@ -452,7 +452,7 @@ public class CA3 {
 
                 }
 				outCells.close();
-				//outcG.close();
+				outcG.close();
 				outCM.close();
             	//outO2.close();
                 //outSBC.close();

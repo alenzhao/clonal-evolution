@@ -21,9 +21,9 @@ def shannon(n, N):
 def sum_digits(digit):
     return sum(int(x) for x in digit if x.isdigit())
 
-size = 1000 #size of the array
-t1 = 500
-t2 = 1000
+size = 100 #size of the array
+t1 = 250
+t2 = 500
 SI1 = 0 #placeholders for Shannon Index values
 SI2 = 0
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
@@ -31,8 +31,8 @@ total_mut2 = np.zeros(size**2)
 my_cmap = plt.cm.get_cmap('nipy_spectral')
 my_cmap.set_under('w')
 
-read_path = '../../../../Thesis/phylogenies/experiment/non-stem/text/'
-write_path = '../figs/andrea_flat/'
+read_path = '../andrea_test/non-stem/text/'
+write_path = '../figs/'
 
 #timepoint 1 clonal evolution
 data = open(read_path+'carriedMutation'+str(t1)).read().replace(',','\n').replace('\n','')
@@ -66,6 +66,6 @@ plt.pcolor(CM2, cmap='nipy_spectral', vmin = 0.001)
 plt.title('S.I. = '+str(-SI2trunc)+', cells = '+str(N2))
 plt.colorbar()
 
-plt.savefig(write_path+'CMplot_run1_'+str(t2)+'.png', dpi = 500)
+# plt.savefig(write_path+'CMplot_run1_'+str(t2)+'.png', dpi = 500)
 
-# plt.show()
+plt.show()

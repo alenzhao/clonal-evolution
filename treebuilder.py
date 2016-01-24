@@ -33,9 +33,9 @@ def sort_pairs(pair):
 
 data = open(read_path+'stemsym6l4t5k.txt').read().replace(',',' ').replace('\n',' ')
 x = data.split()
-ParentChild = np.array(x).astype('str')
-y = len(ParentChild)/3
-ParentChild1 = np.reshape(ParentChild, (y,3))
+ParentChild = np.array(x).astype(str)
+y = len(ParentChild)/5
+ParentChild1 = np.reshape(ParentChild, (y,5))
 firsttwo = ParentChild1[:,0:2] #chops off first line which encodes parameters of simulation and third column which is not yet used
 parents = []
 children = []
@@ -69,7 +69,7 @@ for pair in sorted(firsttwo, key=sort_pairs):
 prune_count = Counter(children) #counter than contains the number of children that each terminal node has]
 # print(parents)
 # print(prune_list)
-print(prune_count)
+# print(prune_count)
 # for key in prune_count.keys():
 #     # node_weight = ln(prune_count[key])
 #     # node_weight = ln(n_children)
@@ -79,7 +79,7 @@ print(prune_count)
 for n in t.traverse():
     n.add_face(TextFace(n.name, fsize = 16), column=0, position="branch-bottom")
     n.add_features(weight=random.randint(0,20))
-t.prune(prune_list)
+# t.prune(prune_list)
 # Create an empty TreeStyle
 ts = TreeStyle()
 # Set our custom layout function

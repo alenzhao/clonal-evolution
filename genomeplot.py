@@ -7,62 +7,83 @@ Jacob Scott 21 Decemeber 2015
 import matplotlib.pyplot as plt
 import numpy as np
 from pylab import rcParams
+import clonal_evolution_functions as cef
 
 my_cmap = plt.cm.get_cmap('nipy_spectral')
 my_cmap.set_under('w')
 
-size = 100 #size of the array
-time = 500
+size = 1000 #size of the array
+time = 1200
 total_mut1 = np.zeros(size**2)
 
-def sum_digits(digit):
-    return sum(int(x) for x in digit if x.isdigit())
-
 # read_path = '../../../../Thesis/phylogenies/experiment/non-stem/text/'
-read_path = 'text/'
+read_path = '../sweep_two/one/text/'
 write_path = '../figs/andrea_flat/'
+filename = 'output1khighMUT'
 
-#bit string data
-data = open(read_path+'genomes'+str(time)).read().replace(',','\n').replace('\n','')
+
+
+data = open(read_path+filename+'.txt').read().replace(',',' ').replace('\n',' ')
 x = data.split()
-CA = np.array(x).astype('string')
-Genomes = np.reshape(CA, (size,size))
-genomelength = len(Genomes[0][0])
-for entry in range(0, size**2):	total_mut1[entry] = np.array(sum_digits(CA[entry])).astype('int')
-mut_array1 = np.reshape(total_mut1, (size,size))
+ParentChild = np.array(x).astype(str)
+y = len(ParentChild)/5
+ParentChild1 = np.reshape(ParentChild, (y,5))
+firsttwo = np.array(ParentChild1[:,0:2]).astype(int) #chops off third-fifth which is not used here
+parents = []
+children = []
+
+family_dict = {} #make dictionary of children and parents
+for row in firsttwo:
+	family_dict.update({row[1]: row[0]})
+
+##########
 
 #timepoint 1 clonal evolution
 data = open(read_path+'carriedMutation'+str(time)).read().replace(',','\n').replace('\n','')
 x = data.split()
 CA = np.array(x).astype('int')
 CM1 = np.reshape(CA, (size,size))
+# print(CM1)
+
+mutation_number = cef.total_mutation_map(CM1, size, family_dict)
 
 rcParams['figure.figsize'] = 10,10
 
-plt.subplot(2,2,1)
-# plt.figure()
-plt.pcolor(mut_array1, cmap='nipy_spectral', vmin = 0.001)
-plt.title('ts '+str(time)+' - mut distance')
-plt.colorbar()
-
-plt.subplot(2,2,2)
-# plt.figure()
+# plt.subplot(2,2,2)
+plt.figure()
 plt.pcolor(CM1, cmap='nipy_spectral', vmin = 0.001)
-plt.title('ts '+str(time)+' - unique muts')
-plt.set_xlabel('Unique mutations')
+plt.title('ts '+str(time)+' - unique clones')
+plt.xlabel('Unique clones')
+plt.colorbar()
+plt.savefig(write_path+'UniqueMuts'+str(time)+'TEST.png', dpi = 500)
+
+# plt.subplot(2,2,1)
+plt.figure()
+plt.pcolor(mutation_number, cmap='nipy_spectral', vmin = 0.001)
+plt.title('ts '+str(time)+' - total muts')
+plt.xlabel('total mutations')
 plt.colorbar()
 
-plt.subplot(2,2,3)
+'''
+# plt.subplot(2,2,3)
 # plt.figure()
-plt.hist(total_mut1, normed=True)
-plt.set_xlabel('Total mutations')
-# plt.yscale('log')
+weightsTM = np.ones_like(mutation_number)/len(mutation_number)
+binsTM = np.linspace(0, np.max(mutation_number), 100)
+n, binsTM, patches = plt.hist(mutation_number, 10, histtype = 'bar', weights = weightsTM, normed = True)
+plt.xlabel('Total mutations')
+plt.xlim([1, np.amax(mutation_number)])
 
 plt.subplot(2,2,4)
 # plt.figure()
-plt.hist(CM1, normed=True)
+weights = np.ones_like(CM1)/len(CM1)
+bins = np.linspace(0, np.max(CM1), 100)
+n, bins, patches = plt.hist(CM1, 10, histtype = 'bar', weights = weights, normed = True)
+# plt.hist(CM1, normed=True)
+plt.xlabel('Unique clones')
+plt.xlim([1, np.amax(CM1)])
 # plt.yscale('log')
-
-plt.savefig(write_path+'Allele_freq_plot_NS_time'+str(time)+'D0_MF5em4_size1c.png', dpi = 500)
+'''
+# plt.show()
+plt.savefig(write_path+'MutNum'+str(time)+'TEST.png', dpi = 500)
 
 # plt.show()

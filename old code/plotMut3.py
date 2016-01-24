@@ -20,9 +20,9 @@ def shannon(n, N):
 def sum_digits(digit):
     return sum(int(x) for x in digit if x.isdigit())
 
-size = 1000 #size of the array
-t1 = 1000
-t2 = 3000
+size = 200 #size of the array
+t1 = 40
+t2 = 80
 SI1 = 0 #placeholders for Shannon Index values
 SI2 = 0
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
@@ -30,7 +30,7 @@ total_mut2 = np.zeros(size**2)
 my_cmap = plt.cm.get_cmap('nipy_spectral')
 my_cmap.set_under('w')
 
-read_path = '../../../../Thesis/phylogenies/experiment/non-stem/text/'
+read_path = '../andrea_test/stem/text/'
 write_path = '../figs/andrea_flat/'
 # #timepoint 1 cells
 # data = open(read_path+'cells'+str(t1)).read().replace(',','\n').replace('\n','')
@@ -50,7 +50,7 @@ SI1trunc = float("{0:.4f}".format(SI1))
 #timepoint 1 mutations
 data = open(read_path+'genomes'+str(t1)).read().replace(',','\n').replace('\n','')
 x = data.split()
-CA = np.array(x).astype('string')
+CA = np.array(x).astype(str)
 for entry in range(0, size**2):	total_mut1[entry] = np.array(sum_digits(CA[entry])).astype('int')
 mut_array1 = np.reshape(total_mut1, (size,size))
 
@@ -112,6 +112,6 @@ plt.pcolor(mut_array2, cmap='nipy_spectral', vmin = 0.001)
 plt.title('Total mutations - ts: '+str(t2))
 plt.colorbar()
 
-plt.savefig(write_path+'2plot_run1'+str(t2)+'.png', dpi = 500)
+# plt.savefig(write_path+'2plot_run1'+str(t2)+'.png', dpi = 500)
 
-# plt.show()
+plt.show()

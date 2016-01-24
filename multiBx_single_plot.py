@@ -34,19 +34,22 @@ def gather_biopsies(biopsy_num, r):
 		biopsy_sites.append(newpoint)
 	return biopsy_sites
 
-def do_biopsies(size, biopsy_num, r, CM1, biopsy_sites): 
+def do_biopsies(size, biopsy_num, r, CM1, biopsy_sites):
+	area = 4*r**2
+	biopsy_Mutlist = np.zeros((biopsy_num,area)).astype('int')
 	cell_count_inBx = np.zeros(biopsy_num)
+	for row in range(0, size):
+		for column in range(0, size):
+			a = (row,column)
+			for bx in range(0, biopsy_num):
+				punch = biopsy_sites[bx]
+				if distance.euclidean(a,punch) <= r:
+					biopsy_Mutlist[bx][cell_count_inBx[bx]] = CM1[column][row]
+					cell_count_inBx[bx] += 1
 	for bx in range(0, biopsy_num):
-		biopsy_Mutlist_temp = [] # for the mutation flags
-		muts_inBx_temp = []
-		punch = biopsy_sites[bx]
-		for row in range(0, size):
-			for column in range(0, size):
-				a = (row,column)
-				if distance.euclidean(a,punch) <= r: 
-					biopsy_Mutlist_temp.append(CM1[column][row])
-		cell_count_inBx[bx] = len(biopsy_Mutlist_temp)
 		SIBx_temp = 0
+		biopsy_Mutlist_temp = (biopsy_Mutlist[bx])[0:cell_count_inBx[bx]]
+		# print biopsy_Mutlist_temp
 		for x in range (0, np.amax(biopsy_Mutlist_temp)):
 			SIBx_temp += shannon(np.bincount(biopsy_Mutlist_temp)[x],cell_count_inBx[bx])
 		SIBx_temp = float("{0:.3f}".format(SIBx_temp))

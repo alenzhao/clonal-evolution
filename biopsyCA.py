@@ -18,8 +18,8 @@ import clonal_evolution_functions as cef
 # parameters
 size = 500 #size of the array
 time = 500
-biopsy_num = 2 #desired number of biopsies
-r = 1 #euclidean distance from random point that you include in biopsy
+biopsy_num = 3 #desired number of biopsies
+r = 30 #euclidean distance from random point that you include in biopsy
 SI1 = 0 #placeholders for Shannon Index values
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
 detection_threshold = 0.7 #threshold for detection of clone/allele
@@ -98,7 +98,7 @@ muts_of_type_trunc = np.delete(muts_of_type, truncation_list, 1)
 total_mut_at_site_trunc = np.delete(total_mut_at_site, truncation_list, 1)
 alleles_trunc = np.delete(allele_ID, truncation_list)
 
-
+allele_ticks = np.linspace(1,len(alleles_trunc),len(alleles_trunc))
 '''PLOTS'''
 rcParams['figure.figsize'] = 15,7
 plt.figure()
@@ -106,8 +106,9 @@ plt.figure()
 for i in range(0,biopsy_num):
 	# plt.figure()
 	plt.subplot(2, biopsy_num, i+1) 
-	plt.bar(alleles_trunc, muts_of_type_trunc[i]/len(derived_genomes_inBx[0]), align='center', alpha=0.4)
-	plt.xticks(alleles_trunc, rotation = 315)
+	plt.bar(allele_ticks, muts_of_type_trunc[i]/len(derived_genomes_inBx[0]), align='center', alpha=0.4)
+	# plt.setp(fig1, xticks = allele_ticks, xticklabels = alleles_trunc)
+	plt.xticks(allele_ticks, rotation = 315)
 	plt.xlabel('frequecy of clone')	
 	plt.xlabel('Unique mutation flag')
 	plt.ylim([0, 1])
@@ -138,8 +139,10 @@ for bx in range(0,biopsy_num):
 		if total_muts_trunc[bx][i] == 1: 
 			colors.append('r') #assign red color to alleles above detection threshold
 		else: colors.append('b') 
-	plt.bar(alleles_trunc, allele_freq, align='center', alpha=1, color=colors)
-	plt.xticks(alleles_trunc, rotation = 315)
+	plt.bar(allele_ticks, allele_freq, align='center', alpha=1, color=colors)
+	# plt.setp(fig1, xticks = allele_ticks, xticklabels = alleles_trunc)
+	plt.xticks(allele_ticks, rotation = 315)
+	# plt.xticklabels(alleles_trunc)
 	plt.ylabel('frequency')	
 	plt.xlabel('allele')
 

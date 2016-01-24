@@ -19,6 +19,20 @@ def shannon(n, N):
 def sum_digits(digit):
     return sum(int(x) for x in digit if x.isdigit())
 
+''' Function to count mutations in entire array ''' 
+def total_mutation_map(CM1, size, family_dict):
+	mutation_number = np.zeros((size,size)).astype(int)
+	for (row, col), cell in np.ndenumerate(CM1):
+		if cell == 0: continue
+		mutation_number[row][col] += 1
+		if cell == 1: continue
+		mutation_number[row][col] += 1
+		parent = family_dict[cell]
+		while parent > 1:
+			mutation_number[row][col] += 1
+			parent = family_dict[parent]
+	return mutation_number
+
 '''find neighbors of prescribed size for biopsy'''
 def neighborhood(biopsy_site,r):
 	neighboring_cells = []
@@ -60,37 +74,26 @@ def do_biopsies(size, biopsy_num, r, CM1, biopsy_sites):
 
 ''' Function to derive genome and count mutations in provided list of cells ''' 
 def derive_genome_biopsy(biopsy_list, family_dict, CM1):
-	# derived_genomes_inBx = np.zeros(len(biopsy_list)).astype('S300')
 	derived_genomes_inBx = list(map(str, np.zeros(len(biopsy_list))))
-	# print(derived_genomes_inBx[0])
-	# mutation_number_inBx = np.zeros((size,size)).astype(int)
-	# for position, cell in np.ndenumerate(biopsy_list):
 	for biopsy in range(0,len(biopsy_list)):
 		if biopsy_list[biopsy] == 0:
 			bitstring = (np.max(CM1))*'0'
 			derived_genomes_inBx[biopsy] = ''.join(bitstring)
 			continue
-		# temp_parent = 2
 		bitstring = list('1')
 		bitstring += (np.max(CM1)-1)*'0'
 		if biopsy_list[biopsy] == 1:
-			# derived_genomes_inBx[position] = np.array(bitstring)
-			# print(derived_genomes_inBx[biopsy])
 			derived_genomes_inBx[biopsy] = ''.join(bitstring)
-			# mutation_number_inBx[position] = cef.sum_digits(bitstring)
 			continue 
 		else:
 			temp_parent = family_dict[biopsy_list[biopsy]]
 			bitstring[biopsy_list[biopsy]-1] = '1'
 			while temp_parent > 1:
-				temp_parent = family_dict[position]
+				temp_parent = family_dict[temp_parent]
 				bitstring[temp_parent-1] = '1'
 				if temp_parent == 1: break			
-				# derived_genomes_inBx[position] = np.array(bitstring)
-				# print(derived_genomes_inBx[position])
-				# mutation_number_inBx[position] = cef.sum_digits(bitstring)
 			derived_genomes_inBx[biopsy] = ''.join(bitstring)
-	return derived_genomes_inBx#, mutation_number_inBx
+	return derived_genomes_inBx
 
 ''' Function to count mutations in entire array ''' 
 def count_mutations(CM1, family_dict):

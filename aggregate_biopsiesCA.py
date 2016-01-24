@@ -50,7 +50,6 @@ def do_biopsies_aggregate(size, biopsy_num, r, CM1, biopsy_sites):
 	for bx in range(0, biopsy_num):
 		SIBx_temp = 0
 		biopsy_Mutlist_temp = (biopsy_Mutlist[bx])[0:cell_count_inBx[bx]]
-		# print biopsy_Mutlist_temp
 		for x in range (0, np.amax(biopsy_Mutlist_temp)):
 			SIBx_temp += shannon(np.bincount(biopsy_Mutlist_temp)[x],cell_count_inBx[bx])
 		SIBx_temp = float("{0:.3f}".format(SIBx_temp))
@@ -111,6 +110,7 @@ n, bins, patches = plt.hist(SIBx_agg, 10, histtype = 'bar', alpha = 0.7, color =
 plt.xlabel('Shannon Index')	
 plt.ylabel('frequency')
 plt.ylim([0, 1.2])
+plt.xlim([0, (SItrunc+0.5)])
 plt.legend(loc = 'upper center')
 plt.title('S.I.s bxs of r = '+str(r1)+ ' \n mean:'+str(meanBx1)[:4]+' std:'+str(stdBx1)[:4])
 
@@ -144,6 +144,7 @@ n, bins, patches = plt.hist(SIBx_agg, 10, histtype = 'bar', alpha = 0.7, color =
 plt.xlabel('Shannon Index')	
 plt.ylabel('frequency')
 plt.ylim([0, 1.2])
+plt.xlim([0, (SItrunc+0.5)])
 plt.legend(loc = 'upper center')
 plt.title('S.I.s bxs of r = '+str(r2)+' \n mean:' +str(meanBx2)[:4]+' std:'+str(stdBx2)[:4])
 
