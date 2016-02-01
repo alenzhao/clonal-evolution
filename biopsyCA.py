@@ -16,21 +16,20 @@ import os
 import clonal_evolution_functions as cef
 
 # parameters
-size = 500 #size of the array
-time = 500
-biopsy_num = 3 #desired number of biopsies
-r = 30 #euclidean distance from random point that you include in biopsy
+size = 4000 #size of the array
+time = 4000
+biopsy_num = 50 #desired number of biopsies
+r = 36 #euclidean distance from random point that you include in biopsy
 SI1 = 0 #placeholders for Shannon Index values
 total_mut1 = np.zeros(size**2) #placeholders for mutation arrays
-detection_threshold = 0.7 #threshold for detection of clone/allele
+detection_threshold = 0.75 #threshold for detection of clone/allele
 # area = 4*r**2
 
+read_path = '../andrea_test/16M_trial/text/'
+write_path = '../figs/16M/'
+filename = 'output16M'
 
-read_path = '../andrea_test/non-stem/text/'
-write_path = '../andrea_test/non-stem/figs/'
-filename = 'outputSPEEDTEST'
-
-data = open('../andrea_test/non-stem/'+filename+'.txt').read().replace(',',' ').replace('\n',' ')
+data = open(read_path+filename+'.txt').read().replace(',',' ').replace('\n',' ')
 x = data.split()
 ParentChild = np.array(x).astype(str)
 y = len(ParentChild)/5
@@ -65,6 +64,7 @@ observed_muts = np.zeros((biopsy_num,genomelength))
 total_mut_at_site = np.zeros((biopsy_num,genomelength)) # to count up the number of mutations at each site
 muts_of_type = np.zeros((biopsy_num,genomelength)) # to count up the mutations of each type
 positive_alleles = np.zeros(genomelength) #to be used to store alleles that appear in ANY biopsy
+observed_positive_alleles = np.zeros(genomelength) #to be used to store alleles that meet detection_thresh in ANY biopsy
 derived_genomes_inBx = []
 
 ''' test for mutations above threshold and write down what we find for each biopsy '''
@@ -81,22 +81,25 @@ for bx in range(0,biopsy_num):
 		total_mut_at_site[bx][site] = cef.sum_digits(site_list) #add up the total mutations at the site of interest	
 		if total_mut_at_site[bx][site]/len(derived_genomes_inBx[0]) > detection_threshold: #find the percent positive
 			observed_muts[bx][site] = 1 #if > threshold, count as clonal
+			observed_positive_alleles[site] = 1 #flip bit to recognize observed allele
 	for i in range(0,len(biopsied_mutations[bx])): #over every cell in the biopsy
 		if biopsied_mutations[bx][i] > 0: muts_of_type[bx][biopsied_mutations[bx][i]-1] += 1
 
-# np.savetxt('observed_muts.txt', observed_muts, fmt='%.0f')
+np.savetxt(write_path+'observed_muts_16M.txt', observed_muts, fmt='%.0f')
 
 allele_ID = np.linspace(1,genomelength,genomelength) #all possible alleles
 truncation_list = [] #list of alleles that don't appear
 
 #create truncated version of observed_muts which only has entries at positions where there exists a positive_alleles = 1
 for i in range (0,genomelength):
-	if positive_alleles[i] == 0:
+	if observed_positive_alleles[i] == 0:
 		truncation_list.append(i)
 total_muts_trunc = np.delete(observed_muts, truncation_list, 1)
 muts_of_type_trunc = np.delete(muts_of_type, truncation_list, 1)
 total_mut_at_site_trunc = np.delete(total_mut_at_site, truncation_list, 1)
 alleles_trunc = np.delete(allele_ID, truncation_list)
+
+np.savetxt(write_path+'observed_muts_16M_truncated.txt', total_muts_trunc.T, fmt='%.0f')
 
 allele_ticks = np.linspace(1,len(alleles_trunc),len(alleles_trunc))
 '''PLOTS'''
@@ -109,7 +112,7 @@ for i in range(0,biopsy_num):
 	plt.bar(allele_ticks, muts_of_type_trunc[i]/len(derived_genomes_inBx[0]), align='center', alpha=0.4)
 	# plt.setp(fig1, xticks = allele_ticks, xticklabels = alleles_trunc)
 	plt.xticks(allele_ticks, rotation = 315)
-	plt.xlabel('frequecy of clone')	
+	plt.ylabel('frequecy of clone')	
 	plt.xlabel('Unique mutation flag')
 	plt.ylim([0, 1])
 	plt.title('Biopsy # '+str(i+1)+': Position '+str(biopsy_sites[i]))
@@ -163,6 +166,6 @@ for x, y in zip(x, y):
 plt.xlim([0, size])
 plt.ylim([0, size])
 
-# plt.savefig(write_path+str(biopsy_num)+'TEST2 r= '+str(r)+'.png', dpi = 500)
+plt.savefig(write_path+str(biopsy_num)+'TEST2 r= '+str(r)+'.png', dpi = 500)
 
-plt.show()
+# plt.show()

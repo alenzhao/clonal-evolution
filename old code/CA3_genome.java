@@ -12,7 +12,7 @@ import java.io.*;
 import java.util.*;
 import static java.lang.Math.*;
 
-public class CA3 {
+public class CA_genome {
 	public static String version="8th dec 2015";
    	public boolean simulationFinished=false;
 	MersenneTwisterFast random;
@@ -110,7 +110,7 @@ public class CA3 {
 
 /*
 	// ******
-	public CA3 (float DiffusionCoeff, float ConsumptionRate, float MichMen, float Hypox)
+	public CA3_genome (float DiffusionCoeff, float ConsumptionRate, float MichMen, float Hypox)
 		{
 		int time = (int) System.currentTimeMillis();
 		random = new MersenneTwisterFast (time);
@@ -141,7 +141,7 @@ public class CA3 {
 		} 
 */
 
-	public CA3 (float SCSymmetricDivBalance, int maxDivisions, float densityV)
+	public CA3_genome (float SCSymmetricDivBalance, int maxDivisions, float densityV)
 	{
 		int time = (int) System.currentTimeMillis();
 		random = new MersenneTwisterFast (5); //choose a seed a number or 'time'
@@ -816,8 +816,8 @@ int[] findEmptySiteCancer (int x, int y)
     ///////  this is to run CA without Vis ***********  end from non sensitivty analysis stuff
      public static void main(String args[]) {
 	 int maxTS=1000;
-	      CA3 ca;
-			System.err.println ("# CA version:"+CA3.version);
+	      CA3_genome ca;
+			System.err.println ("# CA version:"+CA3_genome.version);
 			float SCSymmetricDivBalance=0.2f;
 				int maxDivisions=3;
 				float densityV=0.04f;
@@ -831,7 +831,7 @@ int[] findEmptySiteCancer (int x, int y)
 				    	System.err.println ("Arguments needed: s/a maxDivisions timesteps, densityV");
 					System.exit(-1);
 									}
-				 ca = new CA3(SCSymmetricDivBalance, maxDivisions, densityV);
+				 ca = new CA3_genome(SCSymmetricDivBalance, maxDivisions, densityV);
 			 for (int ts=0;ts<maxTS;ts++) ca.nextTimeStep();
 		    }
     ///////  this is to run CA without Vis ***********
@@ -842,8 +842,8 @@ int[] findEmptySiteCancer (int x, int y)
     ///////  this is to run CA without Vis ***********
     public static void main(String args[]) {
 	 int maxTS=101;
-	      CA3 ca;
-			System.err.println ("# CA version:"+CA3.version);
+	      CA3_genome ca;
+			System.err.println ("# CA version:"+CA3_genome.version);
 			float asymmetricRatio=1.0f; // SCSymmetricDivBalance
 			int maxProDivisions=10; // maxDivisions
 			float densityVasculature=0.04f; // densityV
@@ -862,7 +862,7 @@ int[] findEmptySiteCancer (int x, int y)
 				    	System.err.println ("Arguments needed: diffusion consumption MichMen, hypoxia");
 						System.exit(-1);
 							}
-				 ca = new CA3(DiffusionCoeff, ConsumptionRate, MichMen, Hypox);
+				 ca = new CA3_genome(DiffusionCoeff, ConsumptionRate, MichMen, Hypox);
 			 for (int ts=0;ts<maxTS;ts++) ca.nextTimeStep();
 		    }
     ///////  this is to run CA without Vis ***********

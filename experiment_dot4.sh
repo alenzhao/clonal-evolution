@@ -1,0 +1,2 @@
+python centroids.py ../patchiness_experiments/dot4/text/ ../figs/patchiness/dot4/ output_24k_dot4_5c_1em2P 500 24000
+python genomeplot.py ../patchiness_experiments/dot4/text/ ../figs/patchiness/dot4/ output_24k_dot4_5c_1em2P 500 24000

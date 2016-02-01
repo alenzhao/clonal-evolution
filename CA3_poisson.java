@@ -13,7 +13,7 @@ import java.util.*;
 import static java.lang.Math.*;
 
 public class CA3_poisson {
-	public static String version="8th dec 2015";
+	public static String version="29 Jan 2016";
    	public boolean simulationFinished=false;
 	MersenneTwisterFast random;
 	public int mag = 1;
@@ -33,35 +33,36 @@ public class CA3_poisson {
 	int mutationNum = 1;  // counter for mutations, starts with 1 which represents the mutation of the first cancer cell
 	float mutfreq = 0.001f; // frequency of mutation
 	float deathprob = 0.0f;
+	static double lambda = 0.01; // define poisson distribution characteristic
 	
-        // Vascular initialization
-		//int spacing = 12; // for equal vascular spacing
-    	//int vesselNumber = 50; // number of vessels to seed in alternative formulation
-		int size = 200; //8*spacing+1; // Size of the system lattice
-        int centre = size/2; //find centre of lattice
-		int timestep = 0; // Current Number of timesteps in the simulation
-        //int o2perTS = 2304; // 230400 Times we iterate oxygen per cell time step
-		int dataWriteStartTime = 1; // when we start writing down the data
-        int dataWriteStep = 500; // how often we write down the data
-        int dataReportStep = 500; // how often we print the data
-        //float consumption_rate = 0.0f; //usually 1
+    // Vascular initialization
+	//int spacing = 12; // for equal vascular spacing
+	//int vesselNumber = 50; // number of vessels to seed in alternative formulation
+	int size = 200; //8*spacing+1; // Size of the system lattice
+    int centre = size/2; //find centre of lattice
+	int timestep = 0; // Current Number of timesteps in the simulation
+    //int o2perTS = 2304; // 230400 Times we iterate oxygen per cell time step
+	int dataWriteStartTime = 1; // when we start writing down the data
+    int dataWriteStep = 500; // how often we write down the data
+    int dataReportStep = 500; // how often we print the data
+    //float consumption_rate = 0.0f; //usually 1
 
 
 	// Model Parameters
-        //float kDe = 0.1f; // 0.001728f;
-        float hypoxia = 0.1f; // Hypoxia threshold
-		float prolifThreshold = 0.11f; // minimal oxygen to proliferate
-        //float Km = 0.01f; // Michaelis-Menten kinetic parameter
-		float initOxygen = 1.0f;
-		float[] proliferation = {
-		0.25f,  /* healthy cells */ 
-		0.5f, /* stem cells*/
-		0.5f, /* progenitor cells */
-		0.0f, /*mature/differentiated cells */
-		0.0f, /*necrotic area */ // added this cell type
-								};
-		static double lambda = 0.01; // define poisson distribution characteristic
-		static double L = Math.exp(-lambda);
+    //float kDe = 0.1f; // 0.001728f;
+    float hypoxia = 0.1f; // Hypoxia threshold
+	float prolifThreshold = 0.11f; // minimal oxygen to proliferate
+    //float Km = 0.01f; // Michaelis-Menten kinetic parameter
+	float initOxygen = 1.0f;
+	float[] proliferation = {
+	0.25f,  /* healthy cells */ 
+	0.5f, /* stem cells*/
+	0.5f, /* progenitor cells */
+	0.0f, /*mature/differentiated cells */
+	0.0f, /*necrotic area */ // added this cell type
+							};
+
+	static double L = Math.exp(-lambda);
 
 	public static int getPoisson() {
   		double p = 1.0;
@@ -271,26 +272,26 @@ public class CA3_poisson {
 
 	final int[] convertCoordinatesNoFlux(int x, int y)
        {
-               if (x < 0) x = 1;
-               else if (x > size - 1) x = (size - 2);
-               if (y < 0) y = 1;
-               else if (y > size - 1) y = (size - 2);
-               int[] result = new int[2];
-               result[0] = x; result[1] = y;
-               return result;
+       if (x < 0) x = 1;
+       else if (x > size - 1) x = (size - 2);
+       if (y < 0) y = 1;
+       else if (y > size - 1) y = (size - 2);
+       int[] result = new int[2];
+       result[0] = x; result[1] = y;
+       return result;
        }
 
      // This method makes the boundaries periodic **********
 
 	final int[] convertCoordinates(int x, int y)
        {
-               if (x < 0) x = size - 1;
-               else if (x > size - 1) x = 0;
-               if (y < 0) y = size - 1;
-               else if (y > size - 1) y = 0;
-               int[] result = new int[2];
-               result[0] = x; result[1] = y;
-               return result;
+       if (x < 0) x = size - 1;
+       else if (x > size - 1) x = 0;
+       if (y < 0) y = size - 1;
+       else if (y > size - 1) y = 0;
+       int[] result = new int[2];
+       result[0] = x; result[1] = y;
+       return result;
        }
 
 	
@@ -416,14 +417,14 @@ public class CA3_poisson {
 */				
 	//
 		if (cellList==null) cellList = new Bag (size*size);
-		for (int i = 0; i < size; i++)
-			for (int j = 0; j < size; j++) {
-			    if (Cells[i][j] < 4 )  { // All tumour cell types have Cell > 0, now 0 corresponds to 'healthy cells' that consume at basal rate only 
-					int[] p = new int[2];
-					p[0] = i; p[1] = j;
-					cellList.add(p);
-					if (Cells[i][j] == 1) {stem_cells_this_TS++;}
-					else if (Cells[i][j] == 2 || Cells[i][j] == 3) {non_stem_cells_this_TS++;}
+			for (int i = 0; i < size; i++)
+				for (int j = 0; j < size; j++) {
+				    if (Cells[i][j] < 4 )  { // All tumour cell types have Cell > 0, now 0 corresponds to 'healthy cells' that consume at basal rate only 
+						int[] p = new int[2];
+						p[0] = i; p[1] = j;
+						cellList.add(p);
+						if (Cells[i][j] == 1) {stem_cells_this_TS++;}
+						else if (Cells[i][j] == 2 || Cells[i][j] == 3) {non_stem_cells_this_TS++;}
 				}
 			}
 
@@ -431,25 +432,25 @@ public class CA3_poisson {
 			// Select the next lattice element at random
 			int randomElemIndex=0;
 			if (cellList.size()>1) randomElemIndex = random.nextInt(cellList.size()-1);
-	   		int[] point = (int[])cellList.get(randomElemIndex); 
-		   	int rI = point[0];
-		   	int rJ = point[1];
+		   		int[] point = (int[])cellList.get(randomElemIndex); 
+			   	int rI = point[0];
+			   	int rJ = point[1];
 
-			cellList.remove(randomElemIndex); // Remove it from the cell list
-		   	int cell = Cells[rI][rJ];
+				cellList.remove(randomElemIndex); // Remove it from the cell list
+			   	int cell = Cells[rI][rJ];
    
 			// Cell death
 			//if ((Oxygen[rI][rJ]<hypoxia)) {
 			if ((random.nextFloat()<deathprob) && Cells[rI][rJ]>0){ // x% chances of dying 
 				Age[rI][rJ]=0;
 				if (Cells[rI][rJ]==1) stemDeathCounter[rI][rJ]++;
-				if  (Cells[rI][rJ]<4 ) {
-				//TACDeathCounter[rI][rJ]++;
-				Cells[rI][rJ]=4; // was 0, now making necrotic area (truly empty)
-				deaths++;
-				stemBirthCounter[rI][rJ]=0;
-				carriedmutation[rI][rJ] = 0; // empty space now has no mutations
-				}}
+					if  (Cells[rI][rJ]<4 ) {
+						//TACDeathCounter[rI][rJ]++;
+						Cells[rI][rJ]=4; // was 0, now making necrotic area (truly empty)
+						deaths++;
+						stemBirthCounter[rI][rJ]=0;
+						carriedmutation[rI][rJ] = 0; // empty space now has no mutations
+						}}
 			
 
 			else if ((cell==3) && (Age[rI][rJ]>100*maxMatureCellAge)) { // added * to allow for an update each celltimestep/x **************************
@@ -471,14 +472,14 @@ public class CA3_poisson {
 
 			//healthy division
 			else if ((cell==0) && (vacantSites(rI,rJ)>0)) {
-			if (proliferation[cell]>=random.nextFloat()) {// If tossing the coin we are to proliferate...
+				if (proliferation[cell]>=random.nextFloat()) {// If tossing the coin we are to proliferate...
 				    //if (Oxygen[rI][rJ]>prolifThreshold) { // AND the oxygen concentration is enough for division..
 					//consumption[rI][rJ]=consumptionDivision[Cells[rI][rJ]];
-				        int[] daughter = findEmptySite (rI,rJ);
-						births++;
-						Cells[daughter[0]][daughter[1]] = 0;
-						carriedmutation[daughter[0]][daughter[1]] = 0; 
-			   			}}
+			        int[] daughter = findEmptySite (rI,rJ);
+					births++;
+					Cells[daughter[0]][daughter[1]] = 0;
+					carriedmutation[daughter[0]][daughter[1]] = 0; 
+		   			}}
 			   			//}
 
 			// cancer division
@@ -498,7 +499,7 @@ public class CA3_poisson {
                             		stemBirthCounter[daughter[0]][daughter[1]]=stemBirthCounter[rI][rJ]; //update stem birth counter
                             		carriedmutation[daughter[0]][daughter[1]]=carriedmutation[rI][rJ]; //inherit mutational status of parent
                             			for (int i=1;i<=getPoisson();i++) {
-                            				System.out.println("mutation!"+i);
+                            				// System.out.println("mutation!"+i);
                             				//if (mutfreq>random.nextFloat()) { // small chance of mutation
                             				mutationNum++; // advance mutation number
                             				System.out.println (+carriedmutation[rI][rJ]+", "+mutationNum+", "+stem_cells_this_TS+", "+non_stem_cells_this_TS+", "+timestep); // print (parent,child) pair
@@ -528,13 +529,14 @@ public class CA3_poisson {
 								}
 							}
 						}
-				} else if (pMotility>random.nextFloat()) { // Migration = not in use
-						int[] daughter = findEmptySite (rI,rJ);
-						Cells[daughter[0]][daughter[1]]=cell;
-						Cells[rI][rJ]=0;
-						Age[daughter[0]][daughter[1]]=Age[rI][rJ];
-						Age[rI][rJ]=0;
-						System.err.println ("moving "+rI+", "+rJ);
+				} 
+				else if (pMotility>random.nextFloat()) { // Migration = not in use
+					int[] daughter = findEmptySite (rI,rJ);
+					Cells[daughter[0]][daughter[1]]=cell;
+					Cells[rI][rJ]=0;
+					Age[daughter[0]][daughter[1]]=Age[rI][rJ];
+					Age[rI][rJ]=0;
+					System.err.println ("moving "+rI+", "+rJ);
 				}
 			// Aging for mature cells
 			if (cell==3) Age[rI][rJ]++;
@@ -673,11 +675,12 @@ int[] findEmptySiteCancer (int x, int y)
 		int vacantElemIndexCancer = random.nextInt(vacantSitesCancer.size());
 		int[] p = (int[])vacantSitesCancer.get(vacantElemIndexCancer);
 		return (int[])p;	
-		} else {
-		int[] p = new int[2];
-		p[0] = x; p[1] = y; // Just return the original
-		System.out.println ("wrong!:"+vacantSitesCancer (x,y)+" - "+vacantSitesCancer.size());
-		return p;
+		} 
+		else {
+			int[] p = new int[2];
+			p[0] = x; p[1] = y; // Just return the original
+			System.out.println ("wrong!:"+vacantSitesCancer (x,y)+" - "+vacantSitesCancer.size());
+			return p;
 				}
 
 }
@@ -728,23 +731,25 @@ int[] findEmptySiteCancer (int x, int y)
      public static void main(String args[]) {
 	 int maxTS=1000;
 	      CA3_poisson ca;
-			System.err.println ("# CA version:"+CA3_poisson.version);
-			float SCSymmetricDivBalance=0.2f;
-				int maxDivisions=3;
-				float densityV=0.04f;
-					if (args.length==4) {
-				    	SCSymmetricDivBalance = Float.parseFloat (args[0]);
-						maxDivisions = Integer.parseInt (args[1]);
-							maxTS=Integer.parseInt (args[2]);
-							densityV=Float.parseFloat(args[3]);
-								System.err.println ("Balance: "+SCSymmetricDivBalance+" maxDiv: "+maxDivisions+" maxTS: "+ maxTS);
-									} else {
-				    	System.err.println ("Arguments needed: s/a maxDivisions timesteps, densityV");
+		System.err.println ("# CA version:"+CA3_poisson.version);
+		float SCSymmetricDivBalance=0.2f;
+		int maxDivisions=3;
+		float densityV=0.04f;
+			if (args.length==4) {
+		    	SCSymmetricDivBalance = Float.parseFloat (args[0]);
+				maxDivisions = Integer.parseInt (args[1]);
+				maxTS=Integer.parseInt (args[2]);
+				densityV=Float.parseFloat(args[3]);
+				System.err.println ("Balance: "+SCSymmetricDivBalance+" maxDiv: "+maxDivisions+" maxTS: "+ maxTS);
+				} 
+				else {
+			    	System.err.println ("Arguments needed: s/a maxDivisions timesteps, densityV");
 					System.exit(-1);
 									}
-				 ca = new CA3_poisson(SCSymmetricDivBalance, maxDivisions, densityV);
-			 for (int ts=0;ts<maxTS;ts++) ca.nextTimeStep();
+		    	ca = new CA3_poisson(SCSymmetricDivBalance, maxDivisions, densityV);
+				for (int ts=0;ts<maxTS;ts++) ca.nextTimeStep();
 		    }
+		};
     ///////  this is to run CA without Vis ***********
 
 
@@ -779,4 +784,4 @@ int[] findEmptySiteCancer (int x, int y)
     ///////  this is to run CA without Vis ***********
 */	
 
-};
+// 

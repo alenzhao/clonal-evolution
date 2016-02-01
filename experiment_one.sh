@@ -1,0 +1,2 @@
+python centroids.py ../patchiness_experiments/one/text/ ../figs/patchiness/one/ output_1k_one_5c_1em2P 500 1000
+python genomeplot.py ../patchiness_experiments/one/text/ ../figs/patchiness/one/ output_1k_one_5c_1em2P 500 1000
